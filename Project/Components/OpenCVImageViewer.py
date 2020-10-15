@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QLabel, QPixmap
+from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QPixmap, QImage
 
 
 class OpenCVImageViewer(QLabel):
