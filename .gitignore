@@ -120,5 +120,5 @@ dmypy.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
-./Resources
-
+.Resources
+.Resources/*
