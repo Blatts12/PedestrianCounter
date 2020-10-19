@@ -11,25 +11,32 @@ from Project.Layouts.DisplayLayout import DisplayLayout
 from Project.Layouts.ImageViewerLayout import ImageViewerLayout
 from Project.Layouts.InfoLayout import InfoLayout
 from Project.Components.OpenCVImageViewer import OpenCVImageViewer
+from Project.PedestrianCounter.MainProcess import MainProcessThread
 
 if sys.platform == "win32":
     myAppId = u"jakubmelkowski.pedestriancounter"
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppId)
 
 
+# globalThreadPool = QThreadPool.globalInstance()
 appWidth, appHeight = 1000, 800
+windowName = "Pedestrian Counter"
 
 
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        self.setWindowTitle("Pedestrian Counter")
+        self.setWindowTitle(windowName)
         self.setFixedSize(appWidth, appHeight)
         self.settingsLayout = SettingsLayout()
         self.displayLayout = DisplayLayout()
 
+        self.imageViewer = OpenCVImageViewer()
+        self.mainProcessThread = MainProcessThread()
+        self.mainProcessThread.changePixmap.connect(self.imageViewer.setImage)
+
         self.infoLayout = InfoLayout()
-        self.imageViewerLayout = ImageViewerLayout(OpenCVImageViewer())
+        self.imageViewerLayout = ImageViewerLayout(self.imageViewer)
         self.displayLayout.addLayout(self.imageViewerLayout, 0, 0)
         self.displayLayout.addLayout(self.infoLayout, 0, 1)
 
@@ -40,11 +47,19 @@ class MainWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
+
+        self.mainProcessThread.mainProcess.setCapVideo(
+            "C:/_Projekty/Inzynierka/V-topdown2.mp4"
+        )
+        self.mainProcessThread.mainProcess.setDetector()
+        self.mainProcessThread.mainProcess.setTracker()
+        self.mainProcessThread.start()
         self.show()
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     mainWindow = MainWindow()
     sys.exit(app.exec_())
+    mainWindow.mainProcessThread.stop()

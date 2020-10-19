@@ -7,4 +7,4 @@ class DisplayLayout(QGridLayout):
         super(DisplayLayout, self).__init__(*args, **kwargs)
         self.setColumnStretch(0, 500)
         self.setColumnStretch(1, 300)
-        self.setContentsMargins(QMargins(0, 0, 0, 0))
+        self.setContentsMargins(QMargins(20, 0, 0, 0))
