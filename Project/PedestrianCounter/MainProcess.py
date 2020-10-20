@@ -1,10 +1,15 @@
 import cv2
+import dlib
 from PyQt5.QtCore import pyqtSignal, Qt, QThread, QThreadPool
 from PyQt5.QtGui import QPixmap, QImage
-from Project.PedestrianCounter.Detecting.MobileNetSSD import MobileNetSSD
-from Project.PedestrianCounter.Detecting.Yolo import Yolo
+import Project.PedestrianCounter.Detecting as Detecting
 from Project.PedestrianCounter.Counting.Counter import Counter
 from Project.PedestrianCounter.Tracking.CentroidTracker import CentroidTracker
+from Project.PedestrianCounter.Tracking.KCFTracker import KCFTracker
+from Project.PedestrianCounter.Tracking.CorrelationTracker import CorrelationTracker
+
+# from Project.PedestrianCounter.Detecting.MobileNetSSD import MobileNetSSD
+# from Project.PedestrianCounter.Detecting.Yolo import Yolo
 
 
 class MainProcess:
@@ -12,7 +17,6 @@ class MainProcess:
         self.cap = None
         self.detector = None
         self.tracker = None
-        self.trackers = None
         self.counter = Counter()
         self.centroidTracker = CentroidTracker(maxDistance=70)
 
@@ -21,19 +25,17 @@ class MainProcess:
         self.framesToSkip = 6
         self.margin = 0
 
-        self.detectorDict = {
-            "yolo": Yolo,
-            "mn_ssd": MobileNetSSD,
-        }
+        self.detectorDict = Detecting.DETECTORS
         self.trackerDict = {
-            "boosting": cv2.TrackerBoosting_create,
-            "mil": cv2.TrackerMIL_create,
-            "kcf": cv2.TrackerKCF_create,
-            "tld": cv2.TrackerTLD_create,
-            "medianFlow": cv2.TrackerMedianFlow_create,
-            "goTurn": cv2.TrackerGOTURN_create,
-            "mosse": cv2.TrackerMOSSE_create,
-            "csrt": cv2.TrackerCSRT_create,
+            # "boosting": cv2.TrackerBoosting_create,
+            # "mil": cv2.TrackerMIL_create,
+            "kcf": KCFTracker,
+            "correlation": CorrelationTracker,
+            # "tld": cv2.TrackerTLD_create,
+            # "medianFlow": cv2.TrackerMedianFlow_create,
+            # "goTurn": cv2.TrackerGOTURN_create,
+            # "mosse": cv2.TrackerMOSSE_create,
+            # "csrt": cv2.TrackerCSRT_create,
         }
 
     def setFramesToSkip(self, frames=6):
@@ -43,12 +45,12 @@ class MainProcess:
         self.margin = margin
         self.counter.setMargin(margin)
 
-    def setDetector(self, detectorName="mn_ssd"):
+    def setDetector(self, detectorName="YOLO"):
         self.detector = self.detectorDict[detectorName]()
         self.detector.setModelPath()
 
     def setTracker(self, trackerName="kcf"):
-        self.tracker = trackerName
+        self.tracker = self.trackerDict[trackerName]()
 
     def setCapVideo(self, filePath):
         self.cap = cv2.VideoCapture(filePath)
@@ -77,13 +79,13 @@ class MainProcess:
         boxes = []
 
         if self.totalFrames % self.framesToSkip == 0:
-            self.trackers = cv2.MultiTracker_create()
+            self.tracker.newTracker()
             boxes = self.detector.processFrame(frame, frameWidth, frameHeight)
 
             for box in boxes:
-                self.trackers.add(self.trackerDict[self.tracker](), frame, box)
+                self.tracker.addTracker(frame, box)
         else:
-            success, boxes = self.trackers.update(frame)
+            boxes = self.tracker.updateTrackers(frame)
 
         objects = self.centroidTracker.update(boxes)
 

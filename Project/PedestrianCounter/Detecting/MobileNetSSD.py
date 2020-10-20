@@ -5,6 +5,8 @@ from .IDetector import IDetectorWithModel
 
 
 class MobileNetSSD(IDetectorWithModel):
+    name = "MobileNet SSD"
+
     def __init__(self, confidenceThreshold=0.55):
         self.confidenceThreshold = confidenceThreshold
         self.net = None
@@ -48,7 +50,7 @@ class MobileNetSSD(IDetectorWithModel):
                         int(box[0]),
                         int(box[1]),
                         int(box[2] - box[0]),
-                        int(box[1] - box[1]),
+                        int(box[3] - box[1]),
                     )
                 )
 

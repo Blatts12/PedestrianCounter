@@ -36,9 +36,9 @@ class Counter:
     def _processHorizontal(self, person, frameWidth):
         centroid = tuple(person.getCentroid())
         x = [c[0] for c in person.centroids]
-        del x[0]
         direction = centroid[0] - np.mean(x)
-        meanTheta = np.mean(person.theta) + HALF_PI
+        meanTheta = HALF_PI if not person.theta else np.mean(person.theta) + HALF_PI
+
         halfWidth = frameWidth // 2
 
         if not person.counted and person.updateTime > self.minUpdateTime:
@@ -65,9 +65,8 @@ class Counter:
     def _processVertical(self, person, frameHeight):
         centroid = tuple(person.getCentroid())
         y = [c[1] for c in person.centroids]
-        del y[0]
         direction = centroid[1] - np.mean(y)
-        meanTheta = np.mean(person.theta)
+        meanTheta = 0 if not person.theta else np.mean(person.theta)
         halfHeight = frameHeight // 2
 
         if not person.counted and person.updateTime > self.minUpdateTime:

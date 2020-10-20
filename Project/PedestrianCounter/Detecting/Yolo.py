@@ -5,6 +5,8 @@ from .IDetector import IDetectorWithModel
 
 
 class Yolo(IDetectorWithModel):
+    name = "YOLO"
+
     def __init__(self, confidenceThreshold=0.4):
         self.confidenceThreshold = confidenceThreshold
         self.nmsThreshold = 0.325

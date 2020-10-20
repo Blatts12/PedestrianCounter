@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
         self.mainProcessThread.mainProcess.setCapVideo(
-            "C:/_Projekty/Inzynierka/V-topdown2.mp4"
+            "C:/_Projekty/Inzynierka/V-topdown1.mp4"
         )
         self.mainProcessThread.mainProcess.setDetector()
         self.mainProcessThread.mainProcess.setTracker()
