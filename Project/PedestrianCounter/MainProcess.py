@@ -1,14 +1,11 @@
 import cv2
 import dlib
 from PyQt5.QtCore import pyqtSignal, Qt, QThread, QThreadPool
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtGui import QImage
 import Project.PedestrianCounter.Detecting as Detecting
 import Project.PedestrianCounter.Tracking as Tracking
 from Project.PedestrianCounter.Counting.Counter import Counter
 from Project.PedestrianCounter.Tracking.CentroidTracker import CentroidTracker
-
-# from Project.PedestrianCounter.Detecting.MobileNetSSD import MobileNetSSD
-# from Project.PedestrianCounter.Detecting.Yolo import Yolo
 
 
 class MainProcess:
@@ -184,13 +181,22 @@ class MainProcessThread(QThread):
     def __init__(self, *args, **kwargs):
         super(MainProcessThread, self).__init__(*args, **kwargs)
         self.working = True
+        self.paused = True
         self.mainProcess = MainProcess()
 
     def stop(self):
         self.working = False
 
+    def unpause(self):
+        self.paused = False
+
+    def pause(self):
+        self.paused = True
+
     def run(self):
         while self.working:
+            if self.paused:
+                continue
             frame = self.mainProcess.processFrame()
             if frame is None:
                 continue
