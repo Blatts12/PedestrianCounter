@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget
+from Project.Layouts.Settings.MainTab import MainTabLayout
 
 
 class SettingsLayout(QVBoxLayout):
@@ -15,5 +16,8 @@ class SettingsLayout(QVBoxLayout):
         self.tabs.addTab(self.detectorTab, "Detector")
         self.tabs.addTab(self.trackerTab, "Tracker")
         self.tabs.addTab(self.counterTab, "Counter")
+
+        self.mainTab.layout = MainTabLayout()
+        self.mainTab.setLayout(self.mainTab.layout)
 
         self.addWidget(self.tabs)
