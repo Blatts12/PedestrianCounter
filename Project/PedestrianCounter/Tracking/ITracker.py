@@ -1,7 +1,12 @@
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
 
 
 class ITracker(ABC):
+    @property
+    @abstractproperty
+    def name(self):
+        raise NotImplementedError
+
     @abstractmethod
     def __init__(self):
         pass

@@ -4,6 +4,8 @@ import dlib
 
 
 class CorrelationTracker(ITracker):
+    name = "correlation"
+
     def __init__(self):
         self.trackers = None
 

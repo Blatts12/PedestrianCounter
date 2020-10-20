@@ -3,10 +3,9 @@ import dlib
 from PyQt5.QtCore import pyqtSignal, Qt, QThread, QThreadPool
 from PyQt5.QtGui import QPixmap, QImage
 import Project.PedestrianCounter.Detecting as Detecting
+import Project.PedestrianCounter.Tracking as Tracking
 from Project.PedestrianCounter.Counting.Counter import Counter
 from Project.PedestrianCounter.Tracking.CentroidTracker import CentroidTracker
-from Project.PedestrianCounter.Tracking.KCFTracker import KCFTracker
-from Project.PedestrianCounter.Tracking.CorrelationTracker import CorrelationTracker
 
 # from Project.PedestrianCounter.Detecting.MobileNetSSD import MobileNetSSD
 # from Project.PedestrianCounter.Detecting.Yolo import Yolo
@@ -26,17 +25,16 @@ class MainProcess:
         self.margin = 0
 
         self.detectorDict = Detecting.DETECTORS
-        self.trackerDict = {
-            # "boosting": cv2.TrackerBoosting_create,
-            # "mil": cv2.TrackerMIL_create,
-            "kcf": KCFTracker,
-            "correlation": CorrelationTracker,
-            # "tld": cv2.TrackerTLD_create,
-            # "medianFlow": cv2.TrackerMedianFlow_create,
-            # "goTurn": cv2.TrackerGOTURN_create,
-            # "mosse": cv2.TrackerMOSSE_create,
-            # "csrt": cv2.TrackerCSRT_create,
-        }
+        self.trackerDict = Tracking.TRAKCERS
+        # "boosting": cv2.TrackerBoosting_create,
+        # "mil": cv2.TrackerMIL_create,
+        # "kcf": KCFTracker,
+        # "correlation": CorrelationTracker,
+        # "tld": cv2.TrackerTLD_create,
+        # "medianFlow": cv2.TrackerMedianFlow_create,
+        # "goTurn": cv2.TrackerGOTURN_create,
+        # "mosse": cv2.TrackerMOSSE_create,
+        # "csrt": cv2.TrackerCSRT_create,
 
     def setFramesToSkip(self, frames=6):
         self.framesToSkip = frames

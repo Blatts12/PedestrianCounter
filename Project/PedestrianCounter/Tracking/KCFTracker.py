@@ -3,6 +3,8 @@ import cv2
 
 
 class KCFTracker(ITracker):
+    name = "kcf"
+
     def __init__(self):
         self.trackers = None
 
