@@ -51,18 +51,19 @@ class MainWindow(QMainWindow):
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
 
-        # self.mainProcessThread.mainProcess.setCapVideo(
-        #     "C:/_Projekty/Inzynierka/V-topdown1.mp4"
-        # )
-        # self.mainProcessThread.mainProcess.setDetector()
-        # self.mainProcessThread.mainProcess.setTracker()
-        # self.mainProcessThread.start()
+        self.mainProcessThread.mainProcess.setCapVideo(
+            "C:/_Projekty/Inzynierka/V-topdown1.mp4"
+        )
+        self.mainProcessThread.mainProcess.setDetector()
+        self.mainProcessThread.mainProcess.setTracker()
+        self.mainProcessThread.start()
+        self.mainProcessThread.unpause()
         self.show()
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     mainWindow = MainWindow()
     sys.exit(app.exec_())
     # mainWindow.mainProcessThread.stop()
