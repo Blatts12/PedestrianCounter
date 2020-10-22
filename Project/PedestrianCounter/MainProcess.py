@@ -10,7 +10,10 @@ from Project.PedestrianCounter.Tracking.CentroidTracker import CentroidTracker
 
 class MainProcess:
     def __init__(self):
+        self.capType = None
         self.cap = None
+        self.loopVideo = False
+
         self.detector = None
         self.tracker = None
         self.counter = Counter()
@@ -47,18 +50,26 @@ class MainProcess:
     def setTracker(self, trackerName="kcf"):
         self.tracker = self.trackerDict[trackerName]()
 
-    def setCapVideo(self, filePath):
-        self.cap = cv2.VideoCapture(filePath)
+    def setCap(self, capType, data):
+        self.stop()
+        self.reset()
+        if capType == "Webcam":
+            self.cap = cv2.VideoCapture(int(data), cv2.CAP_DSHOW)
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        else:
+            self.cap = cv2.VideoCapture(data)
 
-    def setCapWebcam(self, index=0):
-        pass
+        self.capType = capType
 
-    def setCapIpcam(self, ip):
-        pass
+    def setLoop(self, loop):
+        self.loopVideo = loop
 
-    def _startCap(self):
-        threadPool = QThreadPool.globalInstance()
-        threadPool.start(self.cap)
+    def reset(self):
+        if self.cap is not None:
+            self.counter.reset()
+            self.centroidTracker.reset()
+            self.totalFrames = 0
 
     def stop(self):
         if self.cap is not None:
@@ -67,8 +78,12 @@ class MainProcess:
     def processFrame(self):
         ret, frame = self.cap.read()
         if not ret:
-            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            ret, frame = self.cap.read()
+            if self.capType == "Video" and self.loopVideo == True:
+                self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            else:
+                self.capType = None
+        if frame is None:
+            return None
 
         frameHeight, frameWidth = frame.shape[:2]
         boxes = []
@@ -181,21 +196,18 @@ class MainProcessThread(QThread):
     def __init__(self, *args, **kwargs):
         super(MainProcessThread, self).__init__(*args, **kwargs)
         self.working = True
-        self.paused = True
+        self.paused = False
         self.mainProcess = MainProcess()
 
     def stop(self):
         self.working = False
 
-    def unpause(self):
-        self.paused = False
-
-    def pause(self):
-        self.paused = True
+    def pause(self, pause):
+        self.paused = pause
 
     def run(self):
         while self.working:
-            if self.paused:
+            if self.paused or self.mainProcess.capType is None:
                 continue
             frame = self.mainProcess.processFrame()
             if frame is None:

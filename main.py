@@ -30,12 +30,20 @@ class MainWindow(QMainWindow):
         self.setFixedSize(appWidth, appHeight)
         self.settingsLayout = SettingsLayout()
         self.displayLayout = DisplayLayout()
+        self.mainProcessThread = MainProcessThread()
 
         # Settings Layout
+        ## Main Tab
+        sourceLayout = self.settingsLayout.mainTab.layout.sourceLayout
+        sourceLayout.changedSource.connect(self.mainProcessThread.mainProcess.setCap)
+        sourceLayout.changedLoop.connect(self.mainProcessThread.mainProcess.setLoop)
+        sourceLayout.changedPause.connect(self.mainProcessThread.pause)
+        sourceLayout.resetCounting.connect(
+            self.mainProcessThread.mainProcess.counter.reset
+        )
 
         # Display Layout
         self.imageViewer = OpenCVImageViewer()
-        self.mainProcessThread = MainProcessThread()
         self.mainProcessThread.changePixmap.connect(self.imageViewer.setImage)
 
         self.infoLayout = InfoLayout()
@@ -51,13 +59,9 @@ class MainWindow(QMainWindow):
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
 
-        self.mainProcessThread.mainProcess.setCapVideo(
-            "C:/_Projekty/Inzynierka/V-topdown1.mp4"
-        )
         self.mainProcessThread.mainProcess.setDetector()
         self.mainProcessThread.mainProcess.setTracker()
         self.mainProcessThread.start()
-        self.mainProcessThread.unpause()
         self.show()
 
 

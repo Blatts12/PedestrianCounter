@@ -12,6 +12,10 @@ class Counter:
         self.up = 0  # or right
         self.down = 0  # or left
 
+    def reset(self):
+        self.up = 0
+        self.down = 0
+
     def setMargin(self, margin):
         self.margin = margin
 

@@ -47,6 +47,10 @@ class CentroidTracker:
         self.maxDistance = maxDistance
         self.maxDisappearance = maxDisappearance
 
+    def reset(self):
+        self.nextObjectId = 0
+        self.trackedObjects = OrderedDict()
+
     def register(self, centroid):
         self.trackedObjects[self.nextObjectId] = TrackedObject(
             self.nextObjectId, centroid
