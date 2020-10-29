@@ -12,6 +12,8 @@ from Project.Layouts.ImageViewerLayout import ImageViewerLayout
 from Project.Layouts.InfoLayout import InfoLayout
 from Project.Components.OpenCVImageViewer import OpenCVImageViewer
 from Project.PedestrianCounter.MainProcess import MainProcessThread
+from Project.PedestrianCounter.Detecting import DETECTORS
+from Project.PedestrianCounter.Tracking import TRAKCERS
 
 if sys.platform == "win32":
     myAppId = u"jakubmelkowski.pedestriancounter"
@@ -30,16 +32,29 @@ class MainWindow(QMainWindow):
         self.setFixedSize(appWidth, appHeight)
         self.settingsLayout = SettingsLayout()
         self.displayLayout = DisplayLayout()
-        self.mainProcessThread = MainProcessThread()
+        self.mainProcessThread = MainProcessThread(
+            list(DETECTORS.keys())[0], list(TRAKCERS.keys())[0]
+        )
 
         # Settings Layout
         ## Main Tab
         sourceLayout = self.settingsLayout.mainTab.layout.sourceLayout
-        sourceLayout.changedSource.connect(self.mainProcessThread.mainProcess.setCap)
+        sourceLayout.changedSource.connect(self.changeSource)
         sourceLayout.changedLoop.connect(self.mainProcessThread.mainProcess.setLoop)
         sourceLayout.changedPause.connect(self.mainProcessThread.pause)
         sourceLayout.resetCounting.connect(
             self.mainProcessThread.mainProcess.counter.reset
+        )
+        ## Detector Tab
+        firstSection = self.settingsLayout.detectorTab.layout.firstSection
+        firstSection.changedConfidence.connect(
+            self.mainProcessThread.mainProcess.detector.setConfidence
+        )
+        firstSection.changedNMS.connect(
+            self.mainProcessThread.mainProcess.detector.setNMSThreshold
+        )
+        firstSection.changedDetector.connect(
+            self.mainProcessThread.mainProcess.setDetector
         )
 
         # Display Layout
@@ -59,10 +74,13 @@ class MainWindow(QMainWindow):
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
 
-        self.mainProcessThread.mainProcess.setDetector()
-        self.mainProcessThread.mainProcess.setTracker()
-        self.mainProcessThread.start()
         self.show()
+
+    def changeSource(self, capType, data):
+        if not self.mainProcessThread.isRunning():
+            self.mainProcessThread.start()
+
+        self.mainProcessThread.setCap(capType, data)
 
 
 if __name__ == "__main__":

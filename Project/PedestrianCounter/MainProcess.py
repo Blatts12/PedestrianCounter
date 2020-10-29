@@ -9,12 +9,15 @@ from Project.PedestrianCounter.Tracking.CentroidTracker import CentroidTracker
 
 
 class MainProcess:
-    def __init__(self):
+    def __init__(self, detectorName, trackerName):
         self.capType = None
         self.cap = None
         self.loopVideo = False
 
         self.detector = None
+        self.changeDetector = False
+        self.newDetectorName = ""
+
         self.tracker = None
         self.counter = Counter()
         self.centroidTracker = CentroidTracker(maxDistance=70)
@@ -26,6 +29,10 @@ class MainProcess:
 
         self.detectorDict = Detecting.DETECTORS
         self.trackerDict = Tracking.TRAKCERS
+
+        self.setTracker(trackerName)
+        self.setDetector(detectorName)
+        self.activateDetector()
         # "boosting": cv2.TrackerBoosting_create,
         # "mil": cv2.TrackerMIL_create,
         # "kcf": KCFTracker,
@@ -43,8 +50,13 @@ class MainProcess:
         self.margin = margin
         self.counter.setMargin(margin)
 
-    def setDetector(self, detectorName="YOLO"):
-        self.detector = self.detectorDict[detectorName]()
+    def setDetector(self, detectorName="MobileNet SSD"):
+        self.changeDetector = True
+        self.newDetectorName = detectorName
+
+    def activateDetector(self):
+        self.changeDetector = False
+        self.detector = self.detectorDict[self.newDetectorName]()
         self.detector.setModelPath()
 
     def setTracker(self, trackerName="kcf"):
@@ -89,6 +101,9 @@ class MainProcess:
         boxes = []
 
         if self.totalFrames % self.framesToSkip == 0:
+            if self.changeDetector:
+                self.activateDetector()
+
             self.tracker.newTracker()
             boxes = self.detector.processFrame(frame, frameWidth, frameHeight)
 
@@ -193,11 +208,16 @@ class MainProcess:
 class MainProcessThread(QThread):
     changePixmap = pyqtSignal(QImage)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, detectorName, trackerName, *args, **kwargs):
         super(MainProcessThread, self).__init__(*args, **kwargs)
         self.working = True
         self.paused = False
-        self.mainProcess = MainProcess()
+        self.mainProcessPaused = True
+        self.mainProcess = MainProcess(detectorName, trackerName)
+
+    def setCap(self, capType, data):
+        self.mainProcess.setCap(capType, data)
+        self.mainProcessPaused = False
 
     def stop(self):
         self.working = False
@@ -207,7 +227,7 @@ class MainProcessThread(QThread):
 
     def run(self):
         while self.working:
-            if self.paused or self.mainProcess.capType is None:
+            if self.paused or self.mainProcessPaused:
                 continue
             frame = self.mainProcess.processFrame()
             if frame is None:

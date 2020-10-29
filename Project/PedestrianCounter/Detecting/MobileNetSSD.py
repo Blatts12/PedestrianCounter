@@ -7,8 +7,8 @@ from .IDetector import IDetectorWithModel
 class MobileNetSSD(IDetectorWithModel):
     name = "MobileNet SSD"
 
-    def __init__(self, confidenceThreshold=0.55):
-        self.confidenceThreshold = confidenceThreshold
+    def __init__(self, confidence=0.55):
+        self.confidence = confidence
         self.net = None
 
     def setModelPath(
@@ -23,8 +23,11 @@ class MobileNetSSD(IDetectorWithModel):
         self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
         self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
-    def setConfidenceThreshold(self, conf):
-        self.confidenceThreshold = conf
+    def setConfidence(self, conf):
+        self.confidence = conf
+
+    def setNMSThreshold(self, threshold):
+        pass
 
     def processFrame(self, frame, frameWidth, frameHeight):
         blob = cv2.dnn.blobFromImage(frame, 0.007843, (frameWidth, frameHeight), 127.5)
@@ -36,7 +39,7 @@ class MobileNetSSD(IDetectorWithModel):
         for i in np.arange(0, detections.shape[2]):
             confidence = detections[0, 0, i, 2]
 
-            if confidence > self.confidenceThreshold:
+            if confidence > self.confidence:
                 idx = int(detections[0, 0, i, 1])
 
                 if idx != 15:  # 15 = person

@@ -7,8 +7,8 @@ from .IDetector import IDetectorWithModel
 class Yolo(IDetectorWithModel):
     name = "YOLO"
 
-    def __init__(self, confidenceThreshold=0.4):
-        self.confidenceThreshold = confidenceThreshold
+    def __init__(self, confidence=0.4):
+        self.confidence = confidence
         self.nmsThreshold = 0.325
         self.inputWidth = 416
         self.inputHeight = 416
@@ -16,8 +16,11 @@ class Yolo(IDetectorWithModel):
         self.net = None
         self.outputLayers = None
 
-    def setConfidenceThreshold(self, conf):
-        self.confidenceThreshold = conf
+    def setConfidence(self, conf):
+        self.confidence = conf
+
+    def setNMSThreshold(self, threshold):
+        self.nmsThreshold = threshold
 
     def setModelPath(
         self, path="C:/_Projekty/Inzynierka/YoloConfigs", name="yolov4-tiny"
@@ -53,7 +56,7 @@ class Yolo(IDetectorWithModel):
                 scores = detection[5:]
                 classId = np.argmax(scores)
                 confidence = scores[classId]
-                if confidence > self.confidenceThreshold and classId == 0:  # 0 = person
+                if confidence > self.confidence and classId == 0:  # 0 = person
                     center_x = int(detection[0] * frameWidth)
                     center_y = int(detection[1] * frameHeight)
                     width = int(detection[2] * frameWidth)
@@ -63,9 +66,7 @@ class Yolo(IDetectorWithModel):
                     confidences.append(float(confidence))
                     boxes.append([left, top, width, height])
 
-        temp = cv2.dnn.NMSBoxes(
-            boxes, confidences, self.confidenceThreshold, self.nmsThreshold
-        )
+        temp = cv2.dnn.NMSBoxes(boxes, confidences, self.confidence, self.nmsThreshold)
         if type(temp) != tuple:
             indices = temp.flatten().tolist()
             for index in indices:

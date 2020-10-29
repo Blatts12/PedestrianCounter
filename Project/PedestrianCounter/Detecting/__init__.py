@@ -6,6 +6,8 @@ from Project.PedestrianCounter.Detecting.Yolo import Yolo
 
 
 DETECTORS = {}
+DEFAULT_CONFIDENCE = 0.45
+DEFAULT_NMS_THRESHOLD = 0.375
 
 baseClasses = [IDetectorWithModel]
 

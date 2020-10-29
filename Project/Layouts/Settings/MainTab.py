@@ -72,7 +72,7 @@ class SourceLayout(QFormLayout):
         self.fileText.setPlaceholderText("Type file path")
 
         self.webcamComboBox = QComboBox()
-        self.webcamComboBox.addItems(self._getAvalibleCameraIds())
+        self.webcamComboBox.addItems(self._getAvalibleCameraIds(20))
 
         self.ipText = QLineEdit()
         self.ipText.setPlaceholderText("Type IP")
@@ -103,11 +103,12 @@ class SourceLayout(QFormLayout):
         fileName = self.fileDialog.getOpenFileName(
             caption="Select file", filter="Video File (*.mp4 *.avi)"
         )
-        self.fileText.setText(fileName[0])
+        if fileName[0] != "":
+            self.fileText.setText(fileName[0])
 
-    def _getAvalibleCameraIds(self):
+    def _getAvalibleCameraIds(self, max):
         cameras = []
-        for i in range(20):
+        for i in range(max):
             cap = cv2.VideoCapture(i, cv2.CAP_DSHOW)
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
             cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -121,7 +122,7 @@ class SourceLayout(QFormLayout):
 class MainSettingsLayout(QFormLayout):
     def __init__(self, *args, **kwargs):
         super(MainSettingsLayout, self).__init__(*args, **kwargs)
-        self.addWidget(QLabel("AEEE"))
+        self.addWidget(QLabel("TODO?"))
 
 
 class MainTabLayout(QGridLayout):
