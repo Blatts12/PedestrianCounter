@@ -12,7 +12,7 @@ from Project.Layouts.ImageViewerLayout import ImageViewerLayout
 from Project.Layouts.InfoLayout import InfoLayout
 from Project.Components.OpenCVImageViewer import OpenCVImageViewer
 from Project.PedestrianCounter.MainProcess import MainProcessThread
-from Project.PedestrianCounter.Detecting import DETECTORS
+from Project.PedestrianCounter.Detecting import Detectors
 from Project.PedestrianCounter.Tracking import TRAKCERS
 
 if sys.platform == "win32":
@@ -20,7 +20,6 @@ if sys.platform == "win32":
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppId)
 
 
-# globalThreadPool = QThreadPool.globalInstance()
 appWidth, appHeight = 1000, 800
 windowName = "Pedestrian Counter"
 
@@ -32,9 +31,7 @@ class MainWindow(QMainWindow):
         self.setFixedSize(appWidth, appHeight)
         self.settingsLayout = SettingsLayout()
         self.displayLayout = DisplayLayout()
-        self.mainProcessThread = MainProcessThread(
-            list(DETECTORS.keys())[0], list(TRAKCERS.keys())[0]
-        )
+        self.mainProcessThread = MainProcessThread()
 
         # Settings Layout
         ## Main Tab
@@ -47,13 +44,7 @@ class MainWindow(QMainWindow):
         )
         ## Detector Tab
         firstSection = self.settingsLayout.detectorTab.layout.firstSection
-        firstSection.changedConfidence.connect(
-            self.mainProcessThread.mainProcess.detector.setConfidence
-        )
-        firstSection.changedNMS.connect(
-            self.mainProcessThread.mainProcess.detector.setNMSThreshold
-        )
-        firstSection.changedDetector.connect(
+        firstSection.changedDetectorName.connect(
             self.mainProcessThread.mainProcess.setDetector
         )
 
@@ -85,6 +76,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    Detectors()
     # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     mainWindow = MainWindow()
     sys.exit(app.exec_())

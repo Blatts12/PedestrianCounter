@@ -1,26 +1,29 @@
 import os
 import cv2
 import numpy as np
-from .IDetector import IDetectorWithModel
+from Project.PedestrianCounter.Detecting.IDetector import IDetectorWithModel
+from Project.Components.Generator.IGeneratorBase import IGeneratorBase
 
 
-class Yolo(IDetectorWithModel):
+class Yolo(IDetectorWithModel, IGeneratorBase):
     name = "YOLO"
+    values = {
+        "Confidence": [0.5, ("Slider", 0, 100, 50, "%"), lambda value: value / 100],
+        "NMS Threshold": [0.4, ("Slider", 0, 100, 40, "%"), lambda value: value / 100],
+    }
 
-    def __init__(self, confidence=0.4):
-        self.confidence = confidence
-        self.nmsThreshold = 0.325
+    def setValue(self, name, value):
+        self.values[name][0] = self.values[name][2](value)
+
+    def getValue(self, name):
+        return self.values[name][0]
+
+    def __init__(self):
         self.inputWidth = 416
         self.inputHeight = 416
 
         self.net = None
         self.outputLayers = None
-
-    def setConfidence(self, conf):
-        self.confidence = conf
-
-    def setNMSThreshold(self, threshold):
-        self.nmsThreshold = threshold
 
     def setModelPath(
         self, path="C:/_Projekty/Inzynierka/YoloConfigs", name="yolov4-tiny"
@@ -56,7 +59,9 @@ class Yolo(IDetectorWithModel):
                 scores = detection[5:]
                 classId = np.argmax(scores)
                 confidence = scores[classId]
-                if confidence > self.confidence and classId == 0:  # 0 = person
+                if (
+                    confidence > self.values["Confidence"][0] and classId == 0
+                ):  # 0 = person
                     center_x = int(detection[0] * frameWidth)
                     center_y = int(detection[1] * frameHeight)
                     width = int(detection[2] * frameWidth)
@@ -66,7 +71,12 @@ class Yolo(IDetectorWithModel):
                     confidences.append(float(confidence))
                     boxes.append([left, top, width, height])
 
-        temp = cv2.dnn.NMSBoxes(boxes, confidences, self.confidence, self.nmsThreshold)
+        temp = cv2.dnn.NMSBoxes(
+            boxes,
+            confidences,
+            self.values["Confidence"][0],
+            self.values["NMS Threshold"][0],
+        )
         if type(temp) != tuple:
             indices = temp.flatten().tolist()
             for index in indices:

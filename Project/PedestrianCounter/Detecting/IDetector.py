@@ -8,7 +8,7 @@ class IDetectorWithModel(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def __init__(self, confidence=0.45):
+    def __init__(self):
         pass
 
     @abstractmethod
@@ -16,14 +16,6 @@ class IDetectorWithModel(ABC):
         """
         returns [(startX, startY, width, height),...]
         """
-        pass
-
-    @abstractmethod
-    def setConfidence(self, conf):
-        pass
-
-    @abstractmethod
-    def setNMSThreshold(self, threshold):
         pass
 
     @abstractmethod

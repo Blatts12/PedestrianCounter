@@ -1,18 +1,16 @@
 import sys
 import inspect
-from Project.PedestrianCounter.Detecting.IDetector import IDetectorWithModel
+from typing import Generator
 from Project.PedestrianCounter.Detecting.MobileNetSSD import MobileNetSSD
 from Project.PedestrianCounter.Detecting.Yolo import Yolo
+from Project.Components.SettingsFormGenerator import SettingsFormGenerator
+from Project.Utils.Singleton import Singleton
 
 
-DETECTORS = {}
-DEFAULT_CONFIDENCE = 0.45
-DEFAULT_NMS_THRESHOLD = 0.375
-
-baseClasses = [IDetectorWithModel]
-
-for name, obj in inspect.getmembers(sys.modules[__name__]):
-    if inspect.isclass(obj):
-        for baseClass in baseClasses:
-            if issubclass(obj, baseClass) and obj not in baseClasses:
-                DETECTORS[obj.name] = obj
+class Detectors(metaclass=Singleton):
+    def __init__(self):
+        _generator = SettingsFormGenerator()
+        self.DICT = {
+            "Yolo": _generator.generate(Yolo()),
+            "MobileNet SDD": _generator.generate(MobileNetSSD()),
+        }

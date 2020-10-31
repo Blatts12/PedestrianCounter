@@ -1,4 +1,5 @@
 from Project.PedestrianCounter.Tracking.ITracker import ITracker
+from Project.Components.Generator.IGeneratorBase import IGeneratorBase
 import cv2
 
 

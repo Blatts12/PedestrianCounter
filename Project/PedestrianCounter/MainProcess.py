@@ -2,14 +2,14 @@ import cv2
 import dlib
 from PyQt5.QtCore import pyqtSignal, Qt, QThread, QThreadPool
 from PyQt5.QtGui import QImage
-import Project.PedestrianCounter.Detecting as Detecting
+from Project.PedestrianCounter.Detecting import Detectors
 import Project.PedestrianCounter.Tracking as Tracking
 from Project.PedestrianCounter.Counting.Counter import Counter
 from Project.PedestrianCounter.Tracking.CentroidTracker import CentroidTracker
 
 
 class MainProcess:
-    def __init__(self, detectorName, trackerName):
+    def __init__(self):
         self.capType = None
         self.cap = None
         self.loopVideo = False
@@ -27,11 +27,11 @@ class MainProcess:
         self.framesToSkip = 6
         self.margin = 0
 
-        self.detectorDict = Detecting.DETECTORS
+        self.detectorDict = Detectors().DICT
         self.trackerDict = Tracking.TRAKCERS
 
-        self.setTracker(trackerName)
-        self.setDetector(detectorName)
+        self.setTracker("kcf")
+        self.setDetector("Yolo")
         self.activateDetector()
         # "boosting": cv2.TrackerBoosting_create,
         # "mil": cv2.TrackerMIL_create,
@@ -56,7 +56,7 @@ class MainProcess:
 
     def activateDetector(self):
         self.changeDetector = False
-        self.detector = self.detectorDict[self.newDetectorName]()
+        self.detector = self.detectorDict[self.newDetectorName][0]
         self.detector.setModelPath()
 
     def setTracker(self, trackerName="kcf"):
@@ -208,12 +208,12 @@ class MainProcess:
 class MainProcessThread(QThread):
     changePixmap = pyqtSignal(QImage)
 
-    def __init__(self, detectorName, trackerName, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(MainProcessThread, self).__init__(*args, **kwargs)
         self.working = True
         self.paused = False
         self.mainProcessPaused = True
-        self.mainProcess = MainProcess(detectorName, trackerName)
+        self.mainProcess = MainProcess()
 
     def setCap(self, capType, data):
         self.mainProcess.setCap(capType, data)

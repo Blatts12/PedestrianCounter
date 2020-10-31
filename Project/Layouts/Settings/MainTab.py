@@ -3,7 +3,6 @@ import os
 import ipaddress
 from PyQt5.QtWidgets import (
     QGridLayout,
-    QHBoxLayout,
     QFormLayout,
     QLabel,
     QComboBox,
