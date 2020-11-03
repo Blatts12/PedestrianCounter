@@ -9,15 +9,11 @@ class IGeneratorBase(ABC):
 
     """
         values = {
-            name: (value, (desc))
-            "Confidence": (50, ("Slider", 0, 100, 50, "%"))
+            name: (value, (desc), value set modifier)
+            "Confidence": (50, ("Slider", 0, 100, 50, "%"), lambda value: value / 100)
         }
     """
 
     @abstractmethod
-    def setValue(self, name, value):
-        pass
-
-    @abstractmethod
-    def getValue(self, name):
-        pass
+    def set_value(self, name, value):
+        raise NotImplementedError

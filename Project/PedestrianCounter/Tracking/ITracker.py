@@ -12,13 +12,13 @@ class ITracker(ABC):
         pass
 
     @abstractmethod
-    def newTracker(self):
+    def new_tracker(self):
         pass
 
     @abstractmethod
-    def addTracker(self, frame, box):
+    def add_tracker(self, frame, box):
         pass
 
     @abstractmethod
-    def updateTrackers(self, frame):
+    def update_trackers(self, frame):
         pass

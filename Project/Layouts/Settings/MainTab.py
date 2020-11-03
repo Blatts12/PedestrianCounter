@@ -22,34 +22,34 @@ class SourceLayout(QFormLayout):
     changedPause = pyqtSignal(bool)
     resetCounting = pyqtSignal()
 
-    def _changeSource(self):
-        source = self.sourceComboBox.currentText()
+    def _change_source(self):
+        source = self.source_combo_box.currentText()
         data = ""
 
         if source == "Video":
-            data = self.fileText.text()
+            data = self.file_text.text()
             if not os.path.exists(data):
                 QMessageBox.warning(
                     None, "Video", "Path isn't valid of file don't exists"
                 )
                 return
         elif source == "Webcam":
-            data = self.webcamComboBox.currentText()
+            data = self.webcam_combo_box.currentText()
         else:
-            data = self.ipText.text()
+            data = self.ip_text.text()
             try:
                 ipaddress.ip_address(data)
             except ValueError:
                 QMessageBox.warning(None, "Ip Cam", "Ip isn't valid")
                 return
 
-        self.usedSource = source
+        self.used_source = source
         self.changedSource.emit(source, data)
 
-    def _changeLoop(self, loop):
+    def _change_loop(self, loop):
         self.changedLoop.emit(loop)
 
-    def _changePause(self, pause):
+    def _change_pause(self, pause):
         self.changedPause.emit(pause)
 
     def _reset(self):
@@ -57,55 +57,55 @@ class SourceLayout(QFormLayout):
 
     def __init__(self, *args, **kwargs):
         super(SourceLayout, self).__init__(*args, **kwargs)
-        self.usedSource = ""
-        possibleSources = ["Video", "Webcam", "Ip Cam"]
+        self.used_source = ""
+        possible_sources = ["Video", "Webcam", "Ip Cam"]
 
         # Source
-        self.sourceComboBox = QComboBox()
-        self.sourceComboBox.addItems(possibleSources)
+        self.source_combo_box = QComboBox()
+        self.source_combo_box.addItems(possible_sources)
 
-        self.fileDialog = QFileDialog()
-        self.fileButton = QPushButton("Select file")
-        self.fileButton.clicked.connect(self._selectFile)
-        self.fileText = QLineEdit()
-        self.fileText.setPlaceholderText("Type file path")
+        self.file_dialog = QFileDialog()
+        self.file_button = QPushButton("Select file")
+        self.file_button.clicked.connect(self._select_file)
+        self.file_text = QLineEdit()
+        self.file_text.setPlaceholderText("Type file path")
 
-        self.webcamComboBox = QComboBox()
-        self.webcamComboBox.addItems(self._getAvalibleCameraIds(20))
+        self.webcam_combo_box = QComboBox()
+        self.webcam_combo_box.addItems(self._get_avalible_camera_ids(20))
 
-        self.ipText = QLineEdit()
-        self.ipText.setPlaceholderText("Type IP")
+        self.ip_text = QLineEdit()
+        self.ip_text.setPlaceholderText("Type IP")
 
-        self.changeButton = QPushButton("Change")
-        self.changeButton.clicked.connect(self._changeSource)
+        self.change_button = QPushButton("Change")
+        self.change_button.clicked.connect(self._change_source)
 
         # Manipulation
-        self.pauseButton = TwoPhasePushButton("Unpause", "Pause")
-        self.pauseButton.phaseChanged.connect(self._changePause)
-        self.resetButton = QPushButton("Reset")
-        self.resetButton.clicked.connect(self._reset)
-        self.loopButton = TwoPhasePushButton("No loop", "Loop")
-        self.loopButton.phaseChanged.connect(self._changeLoop)
+        self.pause_button = TwoPhasePushButton("Unpause", "Pause")
+        self.pause_button.phaseChanged.connect(self._change_pause)
+        self.reset_button = QPushButton("Reset")
+        self.reset_button.clicked.connect(self._reset)
+        self.loop_button = TwoPhasePushButton("No loop", "Loop")
+        self.loop_button.phaseChanged.connect(self._change_loop)
 
-        self.addRow(QLabel("Source:"), self.sourceComboBox)
-        self.addRow(self.fileButton, self.fileText)
-        self.addRow(QLabel("Webcam:"), self.webcamComboBox)
-        self.addRow(QLabel("Ip Cam:"), self.ipText)
-        self.addRow(self.changeButton)
+        self.addRow(QLabel("Source:"), self.source_combo_box)
+        self.addRow(self.file_button, self.file_text)
+        self.addRow(QLabel("Webcam:"), self.webcam_combo_box)
+        self.addRow(QLabel("Ip Cam:"), self.ip_text)
+        self.addRow(self.change_button)
         self.addRow(QHLine())
-        self.addRow(self.pauseButton)
+        self.addRow(self.pause_button)
         self.addRow(QHLine())
-        self.addRow(QLabel("Reset counting:"), self.resetButton)
-        self.addRow(QLabel("Loop video file:"), self.loopButton)
+        self.addRow(QLabel("Reset counting:"), self.reset_button)
+        self.addRow(QLabel("Loop video file:"), self.loop_button)
 
-    def _selectFile(self):
-        fileName = self.fileDialog.getOpenFileName(
+    def _select_file(self):
+        file_name = self.file_dialog.getOpenFileName(
             caption="Select file", filter="Video File (*.mp4 *.avi)"
         )
-        if fileName[0] != "":
-            self.fileText.setText(fileName[0])
+        if file_name[0] != "":
+            self.file_text.setText(file_name[0])
 
-    def _getAvalibleCameraIds(self, max):
+    def _get_avalible_camera_ids(self, max):
         cameras = []
         for i in range(max):
             cap = cv2.VideoCapture(i, cv2.CAP_DSHOW)
@@ -131,7 +131,7 @@ class MainTabLayout(QGridLayout):
         self.setColumnStretch(1, 50)
         self.setContentsMargins(QMargins(5, 10, 5, 10))
 
-        self.sourceLayout = SourceLayout()
-        self.mainSettingsLayout = MainSettingsLayout()
-        self.addLayout(self.sourceLayout, 0, 0)
-        self.addLayout(self.mainSettingsLayout, 0, 1)
+        self.source_layout = SourceLayout()
+        self.main_settings_layout = MainSettingsLayout()
+        self.addLayout(self.source_layout, 0, 0)
+        self.addLayout(self.main_settings_layout, 0, 1)

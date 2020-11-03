@@ -11,9 +11,9 @@ class GSlider(QGridLayout):
         self.changedValue.emit(value)
 
     # desc("Slider", minium: int, maximum: int, default: int, textAfter: str)
-    def __init__(self, minimum, maximum, default, textAfter, *args, **kwargs):
+    def __init__(self, minimum, maximum, default, text_after, *args, **kwargs):
         super(GSlider, self).__init__(*args, **kwargs)
-        self.textAfter = textAfter
+        self.textAfter = text_after
 
         self.setColumnStretch(0, 92)
         self.setColumnStretch(1, 8)
@@ -21,7 +21,7 @@ class GSlider(QGridLayout):
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setRange(minimum, maximum)
         self.slider.setValue(default)
-        self.text = QLabel(str(default) + textAfter)
+        self.text = QLabel(str(default) + text_after)
         self.slider.valueChanged.connect(self._sliderValueChanged)
 
         self.addWidget(self.slider, 0, 0)

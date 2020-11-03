@@ -12,12 +12,12 @@ class IDetectorWithModel(ABC):
         pass
 
     @abstractmethod
-    def processFrame(self, frame, frameWidth, frameHeight):
+    def process_frame(self, frame, frame_width, frame_height):
         """
         returns [(startX, startY, width, height),...]
         """
         pass
 
     @abstractmethod
-    def setModelPath(self, path, name):
+    def set_model_path(self, path, name):
         pass

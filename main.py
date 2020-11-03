@@ -1,10 +1,6 @@
 import sys
-import os
 import ctypes
-import qdarkstyle
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication
 from Project.Layouts.MainLayout import MainLayout
 from Project.Layouts.SettingsLayout import SettingsLayout
 from Project.Layouts.DisplayLayout import DisplayLayout
@@ -12,72 +8,75 @@ from Project.Layouts.ImageViewerLayout import ImageViewerLayout
 from Project.Layouts.InfoLayout import InfoLayout
 from Project.Components.OpenCVImageViewer import OpenCVImageViewer
 from Project.PedestrianCounter.MainProcess import MainProcessThread
-from Project.PedestrianCounter.Detecting import Detectors
-from Project.PedestrianCounter.Tracking import TRAKCERS
 
 if sys.platform == "win32":
-    myAppId = u"jakubmelkowski.pedestriancounter"
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myAppId)
+    app_id = u"jakubmelkowski.pedestriancounter"
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
 
 
-appWidth, appHeight = 1000, 800
-windowName = "Pedestrian Counter"
+WINDOW_WIDTH, WINDOW_HEIGHT = 1000, 800
+WINDOW_NAME = "Pedestrian Counter"
 
 
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        self.setWindowTitle(windowName)
-        self.setFixedSize(appWidth, appHeight)
-        self.settingsLayout = SettingsLayout()
-        self.displayLayout = DisplayLayout()
-        self.mainProcessThread = MainProcessThread()
+        self.setWindowTitle(WINDOW_NAME)
+        self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
+        self.settings_layout = SettingsLayout()
+        self.display_layout = DisplayLayout()
+        self.main_process_thread = MainProcessThread()
 
         # Settings Layout
         ## Main Tab
-        sourceLayout = self.settingsLayout.mainTab.layout.sourceLayout
-        sourceLayout.changedSource.connect(self.changeSource)
-        sourceLayout.changedLoop.connect(self.mainProcessThread.mainProcess.setLoop)
-        sourceLayout.changedPause.connect(self.mainProcessThread.pause)
-        sourceLayout.resetCounting.connect(
-            self.mainProcessThread.mainProcess.counter.reset
+        source_layout = self.settings_layout.main_tab_layout.source_layout
+        source_layout.changedSource.connect(self.changeSource)
+        source_layout.changedLoop.connect(
+            self.main_process_thread.main_process.set_loop
+        )
+        source_layout.changedPause.connect(self.main_process_thread.pause)
+        source_layout.resetCounting.connect(
+            self.main_process_thread.main_process.counter.reset
         )
         ## Detector Tab
-        firstSection = self.settingsLayout.detectorTab.layout.firstSection
-        firstSection.changedDetectorName.connect(
-            self.mainProcessThread.mainProcess.setDetector
+        detector_section = self.settings_layout.detector_tab_layout.first_section
+        detector_section.changedDetectorName.connect(
+            self.main_process_thread.main_process.set_detector
+        )
+
+        ## Tracker Tab
+        tracker_section = self.settings_layout.tracker_tab_layout.first_section
+        tracker_section.changedTrackerName.connect(
+            self.main_process_thread.main_process.set_tracker
         )
 
         # Display Layout
-        self.imageViewer = OpenCVImageViewer()
-        self.mainProcessThread.changePixmap.connect(self.imageViewer.setImage)
+        self.image_viewer = OpenCVImageViewer()
+        self.main_process_thread.changePixmap.connect(self.image_viewer.set_image)
 
-        self.infoLayout = InfoLayout()
-        self.imageViewerLayout = ImageViewerLayout(self.imageViewer)
-        self.displayLayout.addLayout(self.imageViewerLayout, 0, 0)
-        self.displayLayout.addLayout(self.infoLayout, 0, 1)
+        self.info_layout = InfoLayout()
+        self.image_viewer_layout = ImageViewerLayout(self.image_viewer)
+        self.display_layout.addLayout(self.image_viewer_layout, 0, 0)
+        self.display_layout.addLayout(self.info_layout, 0, 1)
 
-        mainLayout = MainLayout()
-        mainLayout.addLayout(self.settingsLayout, 0, 0)
-        mainLayout.addLayout(self.displayLayout, 1, 0)
+        main_layout = MainLayout()
+        main_layout.addLayout(self.settings_layout, 0, 0)
+        main_layout.addLayout(self.display_layout, 1, 0)
 
         widget = QWidget()
-        widget.setLayout(mainLayout)
+        widget.setLayout(main_layout)
         self.setCentralWidget(widget)
 
         self.show()
 
-    def changeSource(self, capType, data):
-        if not self.mainProcessThread.isRunning():
-            self.mainProcessThread.start()
+    def changeSource(self, cap_type, data):
+        if not self.main_process_thread.isRunning():
+            self.main_process_thread.start()
 
-        self.mainProcessThread.setCap(capType, data)
+        self.main_process_thread.setCap(cap_type, data)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    Detectors()
-    # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     mainWindow = MainWindow()
     sys.exit(app.exec_())
-    # mainWindow.mainProcessThread.stop()

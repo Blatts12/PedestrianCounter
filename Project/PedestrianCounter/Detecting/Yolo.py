@@ -12,60 +12,58 @@ class Yolo(IDetectorWithModel, IGeneratorBase):
         "NMS Threshold": [0.4, ("Slider", 0, 100, 40, "%"), lambda value: value / 100],
     }
 
-    def setValue(self, name, value):
+    def set_value(self, name, value):
         self.values[name][0] = self.values[name][2](value)
 
-    def getValue(self, name):
-        return self.values[name][0]
-
     def __init__(self):
-        self.inputWidth = 416
-        self.inputHeight = 416
+        self.input_width = 416
+        self.input_height = 416
 
         self.net = None
-        self.outputLayers = None
+        self.output_layers = None
+        self.model_active = False
 
-    def setModelPath(
+    def set_model_path(
         self, path="C:/_Projekty/Inzynierka/YoloConfigs", name="yolov4-tiny"
     ):
-        weightsPath = os.path.sep.join([path, name + ".weights"])
-        configPath = os.path.sep.join([path, name + ".cfg"])
-        self.net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
-        self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
-        self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+        if not self.model_active:
+            config_path = os.path.sep.join([path, name + ".cfg"])
+            weights_path = os.path.sep.join([path, name + ".weights"])
+            self.net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
+            self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+            self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
-        layers = self.net.getLayerNames()
-        self.outputLayers = [
-            layers[i[0] - 1] for i in self.net.getUnconnectedOutLayers()
-        ]
+            layers = self.net.getLayerNames()
+            self.output_layers = [
+                layers[i[0] - 1] for i in self.net.getUnconnectedOutLayers()
+            ]
+            self.model_active = True
 
-    def processFrame(self, frame, frameWidth, frameHeight):
+    def process_frame(self, frame, frame_width, frame_height):
         boxes = []
-        returnBoxes = []
+        return_boxes = []
         confidences = []
 
         blob = cv2.dnn.blobFromImage(
             frame,
             1 / 255.0,
-            (self.inputWidth, self.inputHeight),
+            (self.input_width, self.input_height),
             swapRB=True,
             crop=False,
         )
         self.net.setInput(blob)
-        layerOutputs = self.net.forward(self.outputLayers)
+        layer_outputs = self.net.forward(self.output_layers)
 
-        for output in layerOutputs:
+        for output in layer_outputs:
             for detection in output:
                 scores = detection[5:]
-                classId = np.argmax(scores)
-                confidence = scores[classId]
-                if (
-                    confidence > self.values["Confidence"][0] and classId == 0
-                ):  # 0 = person
-                    center_x = int(detection[0] * frameWidth)
-                    center_y = int(detection[1] * frameHeight)
-                    width = int(detection[2] * frameWidth)
-                    height = int(detection[3] * frameHeight)
+                class_id = np.argmax(scores)
+                confidence = scores[class_id]
+                if confidence > self.values["Confidence"][0] and class_id == 0:
+                    center_x = int(detection[0] * frame_width)
+                    center_y = int(detection[1] * frame_height)
+                    width = int(detection[2] * frame_width)
+                    height = int(detection[3] * frame_height)
                     left = int(center_x - width / 2)
                     top = int(center_y - height / 2)
                     confidences.append(float(confidence))
@@ -80,6 +78,6 @@ class Yolo(IDetectorWithModel, IGeneratorBase):
         if type(temp) != tuple:
             indices = temp.flatten().tolist()
             for index in indices:
-                returnBoxes.append(tuple(boxes[index]))
+                return_boxes.append(tuple(boxes[index]))
 
-        return returnBoxes
+        return return_boxes

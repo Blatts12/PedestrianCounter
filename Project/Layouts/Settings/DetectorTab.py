@@ -16,19 +16,21 @@ class FirstSection(QFormLayout):
 
     def __init__(self, detectors, *args, **kwargs):
         super(FirstSection, self).__init__(*args, **kwargs)
-        self.detectorComboBox = QComboBox()
-        self.detectorComboBox.addItems(detectors)
-        self.detectorComboBox.currentIndexChanged.connect(
+        self.detector_combo_box = QComboBox()
+        self.detector_combo_box.addItems(detectors)
+        self.detector_combo_box.currentIndexChanged.connect(
             self.changedDetectorIndex.emit
         )
-        self.detectorComboBox.currentTextChanged.connect(self.changedDetectorName.emit)
+        self.detector_combo_box.currentTextChanged.connect(
+            self.changedDetectorName.emit
+        )
 
-        self.addRow(QLabel("Detector:"), self.detectorComboBox)
+        self.addRow(QLabel("Detector:"), self.detector_combo_box)
 
 
 class DetectorTabLayout(QGridLayout):
     def _changeDetector(self, index):
-        self.stackedLayout.setCurrentIndex(index)
+        self.stacked_layout.setCurrentIndex(index)
 
     def __init__(self, *args, **kwargs):
         super(DetectorTabLayout, self).__init__(*args, **kwargs)
@@ -37,13 +39,13 @@ class DetectorTabLayout(QGridLayout):
         self.setColumnStretch(1, 50)
         self.setContentsMargins(QMargins(5, 10, 5, 10))
 
-        self.stackedLayout = QStackedLayout()
+        self.stacked_layout = QStackedLayout()
         for key, value in self.detectors.items():
             w = QWidget()
             w.setLayout(value[1])
-            self.stackedLayout.addWidget(w)
+            self.stacked_layout.addWidget(w)
 
-        self.firstSection = FirstSection(self.detectors)
-        self.firstSection.changedDetectorIndex.connect(self._changeDetector)
-        self.addLayout(self.firstSection, 0, 0)
-        self.addLayout(self.stackedLayout, 0, 1)
+        self.first_section = FirstSection(self.detectors)
+        self.first_section.changedDetectorIndex.connect(self._changeDetector)
+        self.addLayout(self.first_section, 0, 0)
+        self.addLayout(self.stacked_layout, 0, 1)

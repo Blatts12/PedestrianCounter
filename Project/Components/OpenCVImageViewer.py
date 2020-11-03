@@ -5,7 +5,7 @@ from PyQt5.QtGui import QPixmap, QImage
 
 class OpenCVImageViewer(QLabel):
     @pyqtSlot(QImage)
-    def setImage(self, image):
+    def set_image(self, image):
         self.setPixmap(QPixmap.fromImage(image))
 
     def __init__(self, *args, **kwargs):

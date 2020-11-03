@@ -5,10 +5,10 @@ HALF_PI = pi / 2
 
 
 class Counter:
-    def __init__(self, horizontal=False, margin=0, minUpdateTime=3):
+    def __init__(self, horizontal=False, margin=0, min_update_time=3):
         self.horizontal = horizontal
         self.margin = margin
-        self.minUpdateTime = minUpdateTime
+        self.min_update_time = min_update_time
         self.up = 0  # or right
         self.down = 0  # or left
 
@@ -16,80 +16,80 @@ class Counter:
         self.up = 0
         self.down = 0
 
-    def setMargin(self, margin):
+    def set_margin(self, margin):
         self.margin = margin
 
-    def setMinUpdateTime(self, minUp):
-        self.minUpdateTime = minUp
+    def set_min_update_time(self, min_update_time):
+        self.min_update_time = min_update_time
 
-    def setHorizontal(self, isHor):
-        self.horizontal = isHor
+    def set_horizontal(self, horizontal):
+        self.horizontal = horizontal
 
-    def getInsideUp(self):
+    def get_inside_up(self):
         return self.up - self.down
 
-    def getInsideDown(self):
+    def get_inside_down(self):
         return self.down - self.up
 
-    def processPerson(self, person, frameWidth, frameHeight):
+    def process_person(self, person, frame_width, frame_height):
         if self.horizontal:
-            self._processHorizontal(person, frameWidth)
+            self._process_horizontal(person, frame_width)
         else:
-            self._processVertical(person, frameHeight)
+            self._process_vertical(person, frame_height)
 
-    def _processHorizontal(self, person, frameWidth):
-        centroid = tuple(person.getCentroid())
+    def _process_horizontal(self, person, frame_width):
+        centroid = tuple(person.get_centroid())
         x = [c[0] for c in person.centroids]
         direction = centroid[0] - np.mean(x)
-        meanTheta = HALF_PI if not person.theta else np.mean(person.theta) + HALF_PI
+        mean_theta = HALF_PI if not person.theta else np.mean(person.theta) + HALF_PI
 
-        halfWidth = frameWidth // 2
+        half_width = frame_width // 2
 
-        if not person.counted and person.updateTime > self.minUpdateTime:
+        if not person.counted and person.update_time > self.min_update_time:
             if (
                 direction < 0
-                and meanTheta < 0
-                and centroid[1] < halfWidth
+                and mean_theta < 0
+                and centroid[1] < half_width
                 and centroid[1] > self.margin
             ):
-                print("[{}]UP-MEAN_THETA: {}".format(person.id, meanTheta))
+                print("[{}]UP-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.up += 1
                 person.counted = True
 
             elif (
                 direction > 0
-                and meanTheta > 0
-                and centroid[1] > halfWidth
-                and centroid[1] < frameWidth - self.margin
+                and mean_theta > 0
+                and centroid[1] > half_width
+                and centroid[1] < frame_width - self.margin
             ):
-                print("[{}]DOWN-MEAN_THETA: {}".format(person.id, meanTheta))
+                print("[{}]DOWN-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.down += 1
                 person.counted = True
 
-    def _processVertical(self, person, frameHeight):
-        centroid = tuple(person.getCentroid())
+    def _process_vertical(self, person, frame_height):
+        centroid = tuple(person.get_centroid())
         y = [c[1] for c in person.centroids]
         direction = centroid[1] - np.mean(y)
-        meanTheta = 0 if not person.theta else np.mean(person.theta)
-        halfHeight = frameHeight // 2
+        mean_theta = 0 if not person.theta else np.mean(person.theta)
+        half_height = frame_height // 2
 
-        if not person.counted and person.updateTime > self.minUpdateTime:
+        if not person.counted and person.update_time > self.min_update_time:
             if (
                 direction < 0
-                and meanTheta < 0
-                and centroid[1] < halfHeight
+                and mean_theta < 0
+                and centroid[1] < half_height
                 and centroid[1] > self.margin
             ):
-                print("[{}]UP-MEAN_THETA: {}".format(person.id, meanTheta))
+                print("[{}]UP-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.up += 1
                 person.counted = True
 
             elif (
                 direction > 0
-                and meanTheta > 0
-                and centroid[1] > halfHeight
-                and centroid[1] < frameHeight - self.margin
+                and mean_theta > 0
+                and centroid[1] > half_height
+                and centroid[1] < frame_height - self.margin
             ):
-                print("[{}]DOWN-MEAN_THETA: {}".format(person.id, meanTheta))
+                print("[{}]DOWN-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.down += 1
                 person.counted = True
