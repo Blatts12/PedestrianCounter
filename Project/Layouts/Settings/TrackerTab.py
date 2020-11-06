@@ -27,9 +27,6 @@ class FirstSection(QFormLayout):
 
 
 class TrackerTabLayout(QGridLayout):
-    def _change_tracker(self, index):
-        self.stacked_layout.setCurrentIndex(index)
-
     def __init__(self, *args, **kwargs):
         super(TrackerTabLayout, self).__init__(*args, **kwargs)
         self.trackers = Trackers().DICT
@@ -44,6 +41,8 @@ class TrackerTabLayout(QGridLayout):
             self.stacked_layout.addWidget(w)
 
         self.first_section = FirstSection(self.trackers)
-        self.first_section.changedTrackerIndex.connect(self._change_tracker)
+        self.first_section.changedTrackerIndex.connect(
+            self.stacked_layout.setCurrentIndex
+        )
         self.addLayout(self.first_section, 0, 0)
         self.addLayout(self.stacked_layout, 0, 1)

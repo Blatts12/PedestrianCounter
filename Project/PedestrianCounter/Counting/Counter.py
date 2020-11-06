@@ -1,7 +1,7 @@
 import numpy as np
 from math import pi
 
-HALF_PI = pi / 2
+_HALF_PI = pi / 2
 
 
 class Counter:
@@ -41,7 +41,7 @@ class Counter:
         centroid = tuple(person.get_centroid())
         x = [c[0] for c in person.centroids]
         direction = centroid[0] - np.mean(x)
-        mean_theta = HALF_PI if not person.theta else np.mean(person.theta) + HALF_PI
+        mean_theta = _HALF_PI if not person.theta else np.mean(person.theta) + _HALF_PI
 
         half_width = frame_width // 2
 

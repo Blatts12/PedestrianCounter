@@ -2,17 +2,15 @@ import os
 import cv2
 import numpy as np
 from Project.PedestrianCounter.Detecting.IDetector import IDetectorWithModel
-from Project.Components.Generator.IGeneratorBase import IGeneratorBase
+from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
+from Project.Utils.Generator.ValueHolder import ValueHolder as vh
 
 
 class MobileNetSSD(IDetectorWithModel, IGeneratorBase):
     name = "MobileNet SSD"
     values = {
-        "Confidence": [0.5, ("Slider", 0, 100, 50, "%"), lambda value: value / 100],
+        "Confidence": vh("Slider", (0, 100, 50, "%"), 0.5, lambda value: value / 100),
     }
-
-    def set_value(self, name, value):
-        self.values[name][0] = self.values[name][2](value)
 
     def __init__(self):
         self.net = None
@@ -42,7 +40,7 @@ class MobileNetSSD(IDetectorWithModel, IGeneratorBase):
 
         for i in np.arange(0, detections.shape[2]):
             confidence = detections[0, 0, i, 2]
-            if confidence > self.values["Confidence"][0]:
+            if confidence > self.values["Confidence"].v:
                 idx = int(detections[0, 0, i, 1])
 
                 if idx != 15:

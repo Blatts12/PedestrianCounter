@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QFormLayout, QLabel
 from Project.Components.Generator.GSlider import GSlider
 from Project.Components.Generator.GComboBox import GComboBox
 from Project.Components.Generator.GSpinBox import GSpinBox
+from Project.Components.Generator.GSelectVideoFile import GSelectVideoFile
+from Project.Components.Generator.GCheckBox import GCheckBox
 
 
 class SettingsFormGenerator:
@@ -10,14 +12,18 @@ class SettingsFormGenerator:
         try:
             layout = SettingsFormLayout()
 
-            for key, value in base.values.items():
-                desc = value[1]
-                widget = self._create_widget(desc)
+            for value_name, value_holder in base.values.items():
+                desc = value_holder.desc
+                widget_pair = self._create_widget(value_name, value_holder.type, desc)
                 try:
-                    widget.changedValue.connect(lambda x, k=key: base.set_value(k, x))
+                    widget_pair[0].changedValue.connect(value_holder.set_value)
                 except Exception:
                     pass
-                layout.add_row_with_label(key, widget)
+
+                try:
+                    layout.addRow(widget_pair[1], widget_pair[0])
+                except Exception:
+                    layout.addRow(widget_pair)
 
             return (base, layout)
         except Exception as e:
@@ -27,16 +33,20 @@ class SettingsFormGenerator:
                 % base.__class__.__name__
             ).with_traceback(sys.exc_info()[2])
 
-    def _create_widget(self, desc):
-        name = desc[0]
-        if name == "Slider":
-            return GSlider(desc[1], desc[2], desc[3], desc[4])
-        elif name == "SpinBox":
-            return GSpinBox(desc[1], desc[2], desc[3], desc[4])
-        elif name == "ComboBox":
-            return GComboBox(desc[1])
-        elif name == "None":
-            return QLabel()
+    def _create_widget(self, name, type, desc):
+        if type == "Slider":
+            return (GSlider(desc[0], desc[1], desc[2], desc[3]), name)
+        elif type == "SpinBox":
+            return (GSpinBox(desc[0], desc[1], desc[2], desc[3]), name)
+        elif type == "ComboBox":
+            return (GComboBox(desc[0], desc[1]), name)
+        elif type == "VideoFile":
+            widget = GSelectVideoFile()
+            return (widget, widget.button)
+        elif type == "CheckBox":
+            return GCheckBox(desc)
+        elif type == "Empty":
+            return QLabel("No properties to adjust")
         return QLabel("ERROR")
 
 
@@ -44,5 +54,5 @@ class SettingsFormLayout(QFormLayout):
     def __init__(self, *args, **kwargs):
         super(SettingsFormLayout, self).__init__(*args, **kwargs)
 
-    def add_row_with_label(self, text, item):
-        self.addRow(QLabel(text), item)
+    def add_row_with_label(self, first, second):
+        self.addRow(first, second)

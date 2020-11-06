@@ -3,15 +3,15 @@ from PyQt5.QtCore import pyqtSignal, Qt, QThread
 from PyQt5.QtGui import QImage
 from Project.PedestrianCounter.Detecting import Detectors
 from Project.PedestrianCounter.Tracking import Trackers
+from Project.PedestrianCounter.Sources import Sources
 from Project.PedestrianCounter.Counting.Counter import Counter
 from Project.PedestrianCounter.Tracking.CentroidTracker import CentroidTracker
 
 
 class MainProcess:
     def __init__(self):
-        self.cap_type = None
-        self.cap = None
-        self.loop_video = False
+        self.sources = Sources().DICT
+        self.source = None
 
         self.detector = None
         self.change_detector = False
@@ -35,15 +35,6 @@ class MainProcess:
         self.set_tracker("KCF")
         self.set_detector("Yolo")
         self.activate_detector()
-        # "boosting": cv2.TrackerBoosting_create,
-        # "mil": cv2.TrackerMIL_create,
-        # "kcf": KCFTracker,
-        # "correlation": CorrelationTracker,
-        # "tld": cv2.TrackerTLD_create,
-        # "medianFlow": cv2.TrackerMedianFlow_create,
-        # "goTurn": cv2.TrackerGOTURN_create,
-        # "mosse": cv2.TrackerMOSSE_create,
-        # "csrt": cv2.TrackerCSRT_create,
 
     def set_frames_to_skip(self, frames=6):
         self.frames_to_skip = frames
@@ -69,30 +60,21 @@ class MainProcess:
         self.change_tracker = False
         self.tracker = self.tracker_dict[self.new_tracker_name][0]
 
-    def set_cap(self, cap_type, data):
-        self.stop()
+    def change_source(self, name):
         self.reset()
-        if cap_type == "Webcam":
-            self.cap = cv2.VideoCapture(int(data), cv2.CAP_DSHOW)
-            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        else:
-            self.cap = cv2.VideoCapture(data)
-
-        self.cap_type = cap_type
-
-    def set_loop(self, loop):
-        self.loop_video = loop
+        self.stop()
+        self.sources[name][0].start_cap()
+        self.source = self.sources[name][0]
 
     def reset(self):
-        if self.cap is not None:
+        if self.source is not None:
             self.counter.reset()
             self.centroid_tracker.reset()
             self.total_frames = 0
 
     def stop(self):
-        if self.cap is not None:
-            self.cap.release()
+        if self.source is not None:
+            self.source.stop_cap()
 
     def draw_margin_lines(self, frame, frame_width, frame_height):
         if self.margin > 0:
@@ -146,12 +128,7 @@ class MainProcess:
             )
 
     def process_frame(self):
-        ret, frame = self.cap.read()
-        if not ret:
-            if self.cap_type == "Video" and self.loop_video == True:
-                self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            else:
-                self.cap_type = None
+        frame = self.source.read_frame()
         if frame is None:
             return None
 
@@ -230,8 +207,8 @@ class MainProcessThread(QThread):
         self.main_process_paused = True
         self.main_process = MainProcess()
 
-    def setCap(self, cap_type, data):
-        self.main_process.set_cap(cap_type, data)
+    def change_source(self, cap_type):
+        self.main_process.change_source(cap_type)
         self.main_process_paused = False
 
     def stop(self):

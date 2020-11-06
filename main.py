@@ -30,10 +30,7 @@ class MainWindow(QMainWindow):
         # Settings Layout
         ## Main Tab
         source_layout = self.settings_layout.main_tab_layout.source_layout
-        source_layout.changedSource.connect(self.changeSource)
-        source_layout.changedLoop.connect(
-            self.main_process_thread.main_process.set_loop
-        )
+        source_layout.changedSource.connect(self.change_source)
         source_layout.changedPause.connect(self.main_process_thread.pause)
         source_layout.resetCounting.connect(
             self.main_process_thread.main_process.counter.reset
@@ -69,14 +66,14 @@ class MainWindow(QMainWindow):
 
         self.show()
 
-    def changeSource(self, cap_type, data):
+    def change_source(self, cap_type):
         if not self.main_process_thread.isRunning():
             self.main_process_thread.start()
 
-        self.main_process_thread.setCap(cap_type, data)
+        self.main_process_thread.change_source(cap_type)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    mainWindow = MainWindow()
+    main_window = MainWindow()
     sys.exit(app.exec_())

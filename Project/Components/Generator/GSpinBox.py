@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QSpinBox
+from PyQt5.QtWidgets import QLabel, QSpinBox
 from PyQt5.QtCore import pyqtSignal
 
 

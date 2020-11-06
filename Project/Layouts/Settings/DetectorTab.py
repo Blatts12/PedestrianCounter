@@ -29,9 +29,6 @@ class FirstSection(QFormLayout):
 
 
 class DetectorTabLayout(QGridLayout):
-    def _changeDetector(self, index):
-        self.stacked_layout.setCurrentIndex(index)
-
     def __init__(self, *args, **kwargs):
         super(DetectorTabLayout, self).__init__(*args, **kwargs)
         self.detectors = Detectors().DICT
@@ -46,6 +43,8 @@ class DetectorTabLayout(QGridLayout):
             self.stacked_layout.addWidget(w)
 
         self.first_section = FirstSection(self.detectors)
-        self.first_section.changedDetectorIndex.connect(self._changeDetector)
+        self.first_section.changedDetectorIndex.connect(
+            self.stacked_layout.setCurrentIndex
+        )
         self.addLayout(self.first_section, 0, 0)
         self.addLayout(self.stacked_layout, 0, 1)

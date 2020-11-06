@@ -13,7 +13,3 @@ class IGeneratorBase(ABC):
             "Confidence": (50, ("Slider", 0, 100, 50, "%"), lambda value: value / 100)
         }
     """
-
-    @abstractmethod
-    def set_value(self, name, value):
-        raise NotImplementedError

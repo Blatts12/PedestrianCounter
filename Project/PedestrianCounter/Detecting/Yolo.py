@@ -2,18 +2,18 @@ import os
 import cv2
 import numpy as np
 from Project.PedestrianCounter.Detecting.IDetector import IDetectorWithModel
-from Project.Components.Generator.IGeneratorBase import IGeneratorBase
+from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
+from Project.Utils.Generator.ValueHolder import ValueHolder as vh
 
 
 class Yolo(IDetectorWithModel, IGeneratorBase):
     name = "YOLO"
     values = {
-        "Confidence": [0.5, ("Slider", 0, 100, 50, "%"), lambda value: value / 100],
-        "NMS Threshold": [0.4, ("Slider", 0, 100, 40, "%"), lambda value: value / 100],
+        "Confidence": vh("Slider", (0, 100, 50, "%"), 0.5, lambda value: value / 100),
+        "NMS Threshold": vh(
+            "Slider", (0, 100, 40, "%"), 0.4, lambda value: value / 100
+        ),
     }
-
-    def set_value(self, name, value):
-        self.values[name][0] = self.values[name][2](value)
 
     def __init__(self):
         self.input_width = 416
@@ -59,7 +59,7 @@ class Yolo(IDetectorWithModel, IGeneratorBase):
                 scores = detection[5:]
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
-                if confidence > self.values["Confidence"][0] and class_id == 0:
+                if confidence > self.values["Confidence"].v and class_id == 0:
                     center_x = int(detection[0] * frame_width)
                     center_y = int(detection[1] * frame_height)
                     width = int(detection[2] * frame_width)
@@ -72,8 +72,8 @@ class Yolo(IDetectorWithModel, IGeneratorBase):
         temp = cv2.dnn.NMSBoxes(
             boxes,
             confidences,
-            self.values["Confidence"][0],
-            self.values["NMS Threshold"][0],
+            self.values["Confidence"].v,
+            self.values["NMS Threshold"].v,
         )
         if type(temp) != tuple:
             indices = temp.flatten().tolist()

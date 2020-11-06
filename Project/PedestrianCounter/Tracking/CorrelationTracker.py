@@ -1,15 +1,13 @@
-from Project.Components.Generator.IGeneratorBase import IGeneratorBase
-from Project.PedestrianCounter.Tracking.ITracker import ITracker
 import cv2
 import dlib
+from Project.PedestrianCounter.Tracking.ITracker import ITracker
+from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
+from Project.Utils.Generator.ValueHolder import ValueHolder as vh
 
 
 class CorrelationTracker(ITracker, IGeneratorBase):
     name = "Correlation"
-    values = {"None": [None, ("None")]}
-
-    def set_value(self, name, value):
-        self.values[name][0] = self.values[name][2](value)
+    values = {"Empty": vh()}
 
     def __init__(self):
         self.trackers = None
