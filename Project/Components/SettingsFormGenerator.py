@@ -1,4 +1,5 @@
 import sys
+from collections.abc import Iterable
 from PyQt5.QtWidgets import QFormLayout, QLabel
 from Project.Components.Generator.GSlider import GSlider
 from Project.Components.Generator.GComboBox import GComboBox
@@ -16,7 +17,10 @@ class SettingsFormGenerator:
                 desc = value_holder.desc
                 widget_pair = self._create_widget(value_name, value_holder.type, desc)
                 try:
-                    widget_pair[0].changedValue.connect(value_holder.set_value)
+                    if isinstance(widget_pair, Iterable):
+                        widget_pair[0].changedValue.connect(value_holder.set_value)
+                    else:
+                        widget_pair.changedValue.connect(value_holder.set_value)
                 except Exception:
                     pass
 
