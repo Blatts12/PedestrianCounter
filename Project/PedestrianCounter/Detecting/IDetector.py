@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod, abstractproperty
 
 
-class IDetectorWithModel(ABC):
+class IDetector(ABC):
     @property
     @abstractproperty
     def name(self):
@@ -19,5 +19,5 @@ class IDetectorWithModel(ABC):
         pass
 
     @abstractmethod
-    def set_model_path(self, path, name):
+    def activate(self):
         pass

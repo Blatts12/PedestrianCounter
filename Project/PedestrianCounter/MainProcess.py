@@ -34,7 +34,6 @@ class MainProcess:
 
         self.set_tracker("KCF")
         self.set_detector("Yolo")
-        self.activate_detector()
 
     def set_frames_to_skip(self, frames=6):
         self.frames_to_skip = frames
@@ -50,7 +49,7 @@ class MainProcess:
     def activate_detector(self):
         self.change_detector = False
         self.detector = self.detector_dict[self.new_detector_name][0]
-        self.detector.set_model_path()
+        self.detector.activate()
 
     def set_tracker(self, tracker_name):
         self.change_tracker = True

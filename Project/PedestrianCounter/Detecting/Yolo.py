@@ -1,13 +1,18 @@
 import os
 import cv2
 import numpy as np
-from Project.PedestrianCounter.Detecting.IDetector import IDetectorWithModel
+import vars
+from Project.PedestrianCounter.Detecting.IDetector import IDetector
 from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
 from Project.Utils.Generator.ValueHolder import ValueHolder as vh
 
 
-class Yolo(IDetectorWithModel, IGeneratorBase):
+class Yolo(IDetector, IGeneratorBase):
     name = "YOLO"
+    weights_path = os.path.sep.join([vars.ROOT_PATH, "Resources\YOLO\yolov4-tiny.cfg"])
+    config_path = os.path.sep.join(
+        [vars.ROOT_PATH, "Resources\YOLO\yolov4-tiny.weights"]
+    )
     values = {
         "Confidence": vh("Slider", (0, 100, 50, "%"), 0.5, lambda value: value / 100),
         "NMS Threshold": vh(
@@ -21,12 +26,12 @@ class Yolo(IDetectorWithModel, IGeneratorBase):
 
         self.net = None
         self.output_layers = None
-        self.model_active = False
+        self.activated = False
 
-    def set_model_path(
-        self, path="C:/_Projekty/Inzynierka/YoloConfigs", name="yolov4-tiny"
-    ):
-        if not self.model_active:
+    def activate(self):
+        if not self.activated:
+            path = "C:/_Projekty/pedestrian-counter-gui-test/Resources/YOLO"
+            name = "yolov4-tiny"
             config_path = os.path.sep.join([path, name + ".cfg"])
             weights_path = os.path.sep.join([path, name + ".weights"])
             self.net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
@@ -37,7 +42,7 @@ class Yolo(IDetectorWithModel, IGeneratorBase):
             self.output_layers = [
                 layers[i[0] - 1] for i in self.net.getUnconnectedOutLayers()
             ]
-            self.model_active = True
+            self.activated = True
 
     def process_frame(self, frame, frame_width, frame_height):
         boxes = []

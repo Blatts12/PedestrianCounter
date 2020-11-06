@@ -10,7 +10,6 @@ class GSlider(QGridLayout):
         self.text.setText(str(value) + self.textAfter)
         self.changedValue.emit(value)
 
-    # desc("Slider", minium: int, maximum: int, default: int, textAfter: str)
     def __init__(self, minimum, maximum, default, text_after, *args, **kwargs):
         super(GSlider, self).__init__(*args, **kwargs)
         self.textAfter = text_after

@@ -1,33 +1,38 @@
 import os
 import cv2
 import numpy as np
-from Project.PedestrianCounter.Detecting.IDetector import IDetectorWithModel
+import vars
+from Project.PedestrianCounter.Detecting.IDetector import IDetector
 from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
 from Project.Utils.Generator.ValueHolder import ValueHolder as vh
 
 
-class MobileNetSSD(IDetectorWithModel, IGeneratorBase):
+class MobileNetSSD(IDetector, IGeneratorBase):
     name = "MobileNet SSD"
+    prototxt_path = (
+        vars.ROOT_PATH + "/Resources/MobileNetSSD/MobileNetSSD_deploy.prototxt.txt"
+    )
+    model_path = (
+        vars.ROOT_PATH + "/Resources/MobileNetSSD/MobileNetSSD_deploy.caffemodel"
+    )
     values = {
         "Confidence": vh("Slider", (0, 100, 50, "%"), 0.5, lambda value: value / 100),
     }
 
     def __init__(self):
         self.net = None
-        self.model_active = False
+        self.activated = False
 
-    def set_model_path(
-        self,
-        path="C:/_Projekty/Inzynierka/MobileNetSDDConfigs",
-        name="MobileNetSSD_deploy",
-    ):
-        if not self.model_active:
+    def activate(self):
+        if not self.activated:
+            path = "C:/_Projekty/pedestrian-counter-gui-test/Resources/MobileNetSSD"
+            name = "MobileNetSSD_deploy"
             prototxt_path = os.path.sep.join([path, name + ".prototxt.txt"])
             model_path = os.path.sep.join([path, name + ".caffemodel"])
             self.net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
             self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
             self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-            self.model_active = True
+            self.activated = True
 
     def process_frame(self, frame, frame_width, frame_height):
         blob = cv2.dnn.blobFromImage(

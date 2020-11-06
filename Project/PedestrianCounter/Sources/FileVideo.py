@@ -31,9 +31,6 @@ class FileVideo(ISource, IGeneratorBase):
                 if not ret:
                     self.stop_cap()
                     return None
-        else:
-            self.stop_cap()
-            return None
         return frame
 
     def start_cap(self):

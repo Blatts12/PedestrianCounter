@@ -13,7 +13,6 @@ if sys.platform == "win32":
     app_id = u"jakubmelkowski.pedestriancounter"
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
 
-
 WINDOW_WIDTH, WINDOW_HEIGHT = 1000, 800
 WINDOW_NAME = "Pedestrian Counter"
 
