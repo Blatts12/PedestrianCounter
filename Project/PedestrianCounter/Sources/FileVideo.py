@@ -4,13 +4,15 @@ from PyQt5.QtWidgets import QMessageBox
 from Project.PedestrianCounter.Sources.ISource import ISource
 from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
 from Project.Utils.Generator.ValueHolder import ValueHolder as vh
+from Project.Components.Generator.GCheckBox import GCheckBox
+from Project.Components.Generator.GSelectVideoFile import GSelectVideoFile
 
 
 class FileVideo(ISource, IGeneratorBase):
     name = "Video"
     values = {
-        "File": vh("VideoFile", default=""),
-        "Loop": vh("CheckBox", ("Loop video"), False),
+        "File": vh(GSelectVideoFile(), ""),
+        "Loop": vh(GCheckBox("Loop video"), False),
     }
 
     def __init__(self):

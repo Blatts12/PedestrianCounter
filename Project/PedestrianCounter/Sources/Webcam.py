@@ -4,12 +4,13 @@ from Project.PedestrianCounter.Sources.ISource import ISource
 from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
 from Project.Utils.Generator.ValueHolder import ValueHolder as vh
 from Project.Utils.AvailableWebcams import AvailableWebcams
+from Project.Components.Generator.GComboBox import GComboBox
 
 
 class Webcam(ISource, IGeneratorBase):
     name = "Video"
     values = {
-        "Webcam": vh("ComboBox", (AvailableWebcams().webcams, "Select webcam id"), ""),
+        "Webcam": vh(GComboBox(AvailableWebcams().webcams, "Select webcam id"), ""),
     }
 
     def __init__(self):

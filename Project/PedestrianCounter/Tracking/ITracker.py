@@ -8,17 +8,13 @@ class ITracker(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def __init__(self):
-        pass
-
-    @abstractmethod
     def new_tracker(self):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def add_tracker(self, frame, box):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def update_trackers(self, frame):
-        pass
+        raise NotImplementedError

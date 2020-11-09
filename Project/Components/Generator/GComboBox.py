@@ -1,18 +1,30 @@
 from collections.abc import Iterable
-from PyQt5.QtWidgets import QComboBox
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QComboBox, QLabel
+from PyQt5.QtCore import pyqtSignal, QObject
+from Project.Components.Generator.IGeneratorComponent import IGeneratorComponent
 
 
-class GComboBox(QComboBox):
+class GComboBox(QObject):
     changedValue = pyqtSignal(str)
+    has_buddy = True
 
-    def __init__(self, values, placeholder="", *args, **kwargs):
-        super(GComboBox, self).__init__(*args, **kwargs)
-        if placeholder != "":
-            self.setPlaceholderText(placeholder)
+    def __init__(self, values, placeholder=""):
+        super(GComboBox, self).__init__()
+        self.values = values
+        self.placeholder = placeholder
+        self.widget = None
 
-        if type(values) is str:
-            self.addItem(values)
-        elif isinstance(values, Iterable):
-            self.addItems(values)
-        self.currentTextChanged.connect(self.changedValue.emit)
+    def get_widget(self):
+        self.widget = QComboBox()
+        self.widget.setPlaceholderText(self.placeholder)
+
+        if type(self.values) is str:
+            self.widget.addItem(self.values)
+        elif isinstance(self.values, Iterable):
+            self.widget.addItems(self.values)
+        self.widget.currentTextChanged.connect(self.changedValue.emit)
+
+        return self.widget
+
+    def get_buddy(self, name=""):
+        return QLabel(name)

@@ -8,16 +8,12 @@ class IDetector(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def __init__(self):
-        pass
-
-    @abstractmethod
     def process_frame(self, frame, frame_width, frame_height):
         """
         returns [(startX, startY, width, height),...]
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def activate(self):
-        pass
+        raise NotImplementedError

@@ -8,21 +8,17 @@ class ISource(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def __init__(self):
-        pass
-
-    @abstractmethod
     def ready_for_start(self):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def read_frame(self):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def start_cap(self):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def stop_cap(self):
-        pass
+        raise NotImplementedError

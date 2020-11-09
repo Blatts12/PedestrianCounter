@@ -1,12 +1,11 @@
 import cv2
 from Project.PedestrianCounter.Tracking.ITracker import ITracker
 from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
-from Project.Utils.Generator.ValueHolder import ValueHolder as vh
 
 
 class KCFTracker(ITracker, IGeneratorBase):
     name = "KCF"
-    values = {"Empty": vh()}
+    values = {}
 
     def __init__(self):
         self.trackers = None

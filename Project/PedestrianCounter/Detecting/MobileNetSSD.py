@@ -1,22 +1,16 @@
 import os
 import cv2
 import numpy as np
-import vars
 from Project.PedestrianCounter.Detecting.IDetector import IDetector
 from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
 from Project.Utils.Generator.ValueHolder import ValueHolder as vh
+from Project.Components.Generator.GSlider import GSlider
 
 
 class MobileNetSSD(IDetector, IGeneratorBase):
     name = "MobileNet SSD"
-    prototxt_path = (
-        vars.ROOT_PATH + "/Resources/MobileNetSSD/MobileNetSSD_deploy.prototxt.txt"
-    )
-    model_path = (
-        vars.ROOT_PATH + "/Resources/MobileNetSSD/MobileNetSSD_deploy.caffemodel"
-    )
     values = {
-        "Confidence": vh("Slider", (0, 100, 50, "%"), 0.5, lambda value: value / 100),
+        "Confidence": vh(GSlider(0, 100, 50, "%"), 0.5, lambda value: value / 100),
     }
 
     def __init__(self):

@@ -1,23 +1,17 @@
 import os
 import cv2
 import numpy as np
-import vars
 from Project.PedestrianCounter.Detecting.IDetector import IDetector
 from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
 from Project.Utils.Generator.ValueHolder import ValueHolder as vh
+from Project.Components.Generator.GSlider import GSlider
 
 
 class Yolo(IDetector, IGeneratorBase):
     name = "YOLO"
-    weights_path = os.path.sep.join([vars.ROOT_PATH, "Resources\YOLO\yolov4-tiny.cfg"])
-    config_path = os.path.sep.join(
-        [vars.ROOT_PATH, "Resources\YOLO\yolov4-tiny.weights"]
-    )
     values = {
-        "Confidence": vh("Slider", (0, 100, 50, "%"), 0.5, lambda value: value / 100),
-        "NMS Threshold": vh(
-            "Slider", (0, 100, 40, "%"), 0.4, lambda value: value / 100
-        ),
+        "Confidence": vh(GSlider(0, 100, 50, "%"), 0.5, lambda value: value / 100),
+        "NMS Threshold": vh(GSlider(0, 100, 40, "%"), 0.4, lambda value: value / 100),
     }
 
     def __init__(self):

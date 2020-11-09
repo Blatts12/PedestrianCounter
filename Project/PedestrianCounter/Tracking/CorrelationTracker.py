@@ -2,12 +2,11 @@ import cv2
 import dlib
 from Project.PedestrianCounter.Tracking.ITracker import ITracker
 from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
-from Project.Utils.Generator.ValueHolder import ValueHolder as vh
 
 
 class CorrelationTracker(ITracker, IGeneratorBase):
     name = "Correlation"
-    values = {"Empty": vh()}
+    values = {}
 
     def __init__(self):
         self.trackers = None
