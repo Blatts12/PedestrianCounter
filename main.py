@@ -1,3 +1,4 @@
+from Project.PedestrianCounter.Detecting import Detectors
 import sys
 import ctypes
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication
@@ -68,7 +69,6 @@ class MainWindow(QMainWindow):
     def change_source(self, cap_type):
         if not self.main_process_thread.isRunning():
             self.main_process_thread.start()
-
         self.main_process_thread.change_source(cap_type)
 
 

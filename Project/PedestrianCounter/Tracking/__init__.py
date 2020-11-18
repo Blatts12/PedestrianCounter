@@ -11,3 +11,6 @@ class Trackers(metaclass=Singleton):
             "KCF": generator.generate(KCFTracker()),
             "Correlation": generator.generate(CorrelationTracker()),
         }
+
+    def get_first(self):
+        return list(self.DICT)[0]

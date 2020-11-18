@@ -22,7 +22,7 @@ class GComboBox(QObject):
             self.widget.addItem(self.values)
         elif isinstance(self.values, Iterable):
             self.widget.addItems(self.values)
-        self.widget.currentTextChanged.connect(self.changedValue.emit)
+        self.widget.currentIndexChanged.connect(self.changedValue.emit)
 
         return self.widget
 

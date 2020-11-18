@@ -1,5 +1,6 @@
 import os
 import cv2
+import vars
 import numpy as np
 from Project.PedestrianCounter.Detecting.IDetector import IDetector
 from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
@@ -7,8 +8,8 @@ from Project.Utils.Generator.ValueHolder import ValueHolder as vh
 from Project.Components.Generator.GSlider import GSlider
 
 
-class Yolo(IDetector, IGeneratorBase):
-    name = "YOLO"
+class YoloV4Tiny(IDetector, IGeneratorBase):
+    name = "YoloV4-tiny"
     values = {
         "Confidence": vh(GSlider(0, 100, 50, "%"), 0.5, lambda value: value / 100),
         "NMS Threshold": vh(GSlider(0, 100, 40, "%"), 0.4, lambda value: value / 100),
@@ -24,7 +25,7 @@ class Yolo(IDetector, IGeneratorBase):
 
     def activate(self):
         if not self.activated:
-            path = "C:/_Projekty/pedestrian-counter-gui-test/Resources/YOLO"
+            path = vars.PROJECT_PATH + "\\Resources\\YOLOv4-tiny"
             name = "yolov4-tiny"
             config_path = os.path.sep.join([path, name + ".cfg"])
             weights_path = os.path.sep.join([path, name + ".weights"])

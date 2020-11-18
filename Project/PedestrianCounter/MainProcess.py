@@ -32,8 +32,8 @@ class MainProcess:
         self.detector_dict = Detectors().DICT
         self.tracker_dict = Trackers().DICT
 
-        self.set_tracker("KCF")
-        self.set_detector("Yolo")
+        self.set_tracker(Trackers().get_first())
+        self.set_detector(Detectors().get_first())
 
     def set_frames_to_skip(self, frames=6):
         self.frames_to_skip = frames
@@ -130,7 +130,6 @@ class MainProcess:
         frame = self.source.read_frame()
         if frame is None:
             return None
-
         frame_height, frame_width = frame.shape[:2]
         boxes = []
 
@@ -207,8 +206,11 @@ class MainProcessThread(QThread):
         self.main_process = MainProcess()
 
     def change_source(self, cap_type):
+        print("3a")
         self.main_process.change_source(cap_type)
+        print("3b")
         self.main_process_paused = False
+        print("3c")
 
     def stop(self):
         self.working = False

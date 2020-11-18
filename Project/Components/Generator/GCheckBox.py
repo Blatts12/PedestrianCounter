@@ -18,6 +18,3 @@ class GCheckBox(QObject):
             lambda s: self.changedValue.emit(s == Qt.Checked)
         )
         return self.widget
-
-    def get_buddy(self, name=""):
-        pass

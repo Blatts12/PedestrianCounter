@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+import vars
 from Project.PedestrianCounter.Detecting.IDetector import IDetector
 from Project.Utils.Generator.IGeneratorBase import IGeneratorBase
 from Project.Utils.Generator.ValueHolder import ValueHolder as vh
@@ -19,7 +20,7 @@ class MobileNetSSD(IDetector, IGeneratorBase):
 
     def activate(self):
         if not self.activated:
-            path = "C:/_Projekty/pedestrian-counter-gui-test/Resources/MobileNetSSD"
+            path = vars.PROJECT_PATH + "\\Resources\\MobileNetSSD"
             name = "MobileNetSSD_deploy"
             prototxt_path = os.path.sep.join([path, name + ".prototxt.txt"])
             model_path = os.path.sep.join([path, name + ".caffemodel"])

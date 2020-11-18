@@ -17,6 +17,7 @@ class FileVideo(ISource, IGeneratorBase):
 
     def __init__(self):
         self.cap = None
+        self.working = False
 
     def ready_for_start(self):
         if not os.path.exists(self.values["File"].v):
@@ -25,19 +26,23 @@ class FileVideo(ISource, IGeneratorBase):
         return True
 
     def read_frame(self):
+        if not self.working:
+            return None
         ret, frame = self.cap.read()
-        if not ret:
-            if self.values["Loop"].v:
-                self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-                ret, frame = self.cap.read()
-                if not ret:
-                    self.stop_cap()
-                    return None
+        if not ret and self.values["Loop"].v:
+            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            ret, frame = self.cap.read()
+            if not ret:
+                self.stop_cap()
+                return None
         return frame
 
     def start_cap(self):
         self.cap = cv2.VideoCapture(self.values["File"].v)
+        self.working = True
 
     def stop_cap(self):
+        self.working = False
         if self.cap is not None:
             self.cap.release()
+            self.cap = None

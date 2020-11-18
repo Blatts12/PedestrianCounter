@@ -37,3 +37,4 @@ class Webcam(ISource, IGeneratorBase):
     def stop_cap(self):
         if self.cap is not None:
             self.cap.release()
+            self.cap = None
