@@ -25,10 +25,9 @@ class YoloV4Tiny(IDetector, IGeneratorBase):
 
     def activate(self):
         if not self.activated:
-            path = vars.PROJECT_PATH + "\\Resources\\YOLOv4-tiny"
-            name = "yolov4-tiny"
-            config_path = os.path.sep.join([path, name + ".cfg"])
-            weights_path = os.path.sep.join([path, name + ".weights"])
+            path = os.path.join(vars.RESOURCES_PATH, "YOLOv4-tiny")
+            config_path = os.path.join(path, "yolov4-tiny.cfg")
+            weights_path = os.path.join(path, "yolov4-tiny.weights")
             self.net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
             self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
             self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)

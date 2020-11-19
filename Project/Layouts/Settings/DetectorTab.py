@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import (
     QComboBox,
     QGridLayout,
+    QSpinBox,
     QStackedLayout,
     QFormLayout,
     QLabel,
@@ -13,6 +14,7 @@ from Project.PedestrianCounter.Detecting import Detectors
 class FirstSection(QFormLayout):
     changedDetectorIndex = pyqtSignal(int)
     changedDetectorName = pyqtSignal(str)
+    changedSkipFrames = pyqtSignal(int)
 
     def __init__(self, detectors, *args, **kwargs):
         super(FirstSection, self).__init__(*args, **kwargs)
@@ -25,7 +27,14 @@ class FirstSection(QFormLayout):
             self.changedDetectorName.emit
         )
 
-        self.addRow(QLabel("Detector:"), self.detector_combo_box)
+        self.skip_frames_spinbox = QSpinBox()
+        self.skip_frames_spinbox.setSingleStep(1)
+        self.skip_frames_spinbox.setRange(1, 255)
+        self.skip_frames_spinbox.setValue(6)
+        self.skip_frames_spinbox.valueChanged.connect(self.changedSkipFrames.emit)
+
+        self.addRow("Detector:", self.detector_combo_box)
+        self.addRow("Frames to skip:", self.skip_frames_spinbox)
 
 
 class DetectorTabLayout(QGridLayout):

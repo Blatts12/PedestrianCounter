@@ -20,10 +20,9 @@ class MobileNetSSD(IDetector, IGeneratorBase):
 
     def activate(self):
         if not self.activated:
-            path = vars.PROJECT_PATH + "\\Resources\\MobileNetSSD"
-            name = "MobileNetSSD_deploy"
-            prototxt_path = os.path.sep.join([path, name + ".prototxt.txt"])
-            model_path = os.path.sep.join([path, name + ".caffemodel"])
+            path = os.path.join(vars.RESOURCES_PATH, "MobileNetSSD")
+            prototxt_path = os.path.join(path, "MobileNetSSD_deploy.prototxt.txt")
+            model_path = os.path.join(path, "MobileNetSSD_deploy.caffemodel")
             self.net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
             self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
             self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)

@@ -1,4 +1,6 @@
 import cv2
+import time
+import vars
 from PyQt5.QtCore import pyqtSignal, Qt, QThread
 from PyQt5.QtGui import QImage
 from Project.PedestrianCounter.Detecting import Detectors
@@ -34,6 +36,9 @@ class MainProcess:
 
         self.set_tracker(Trackers().get_first())
         self.set_detector(Detectors().get_first())
+
+        self.prev_frame_time = 0
+        self.new_frame_time = 0
 
     def set_frames_to_skip(self, frames=6):
         self.frames_to_skip = frames
@@ -188,7 +193,11 @@ class MainProcess:
         self.draw_counting_line(frame, frame_width, frame_height)
         self.draw_margin_lines(frame, frame_width, frame_height)
 
-        # Draw margin lines
+        self.new_frame_time = time.time()
+        fps = 1 / (self.new_frame_time - self.prev_frame_time)
+        self.prev_frame_time = self.new_frame_time
+        fps = str(int(fps))
+        cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
         self.total_frames += 1
 
@@ -206,11 +215,8 @@ class MainProcessThread(QThread):
         self.main_process = MainProcess()
 
     def change_source(self, cap_type):
-        print("3a")
         self.main_process.change_source(cap_type)
-        print("3b")
         self.main_process_paused = False
-        print("3c")
 
     def stop(self):
         self.working = False
@@ -224,6 +230,7 @@ class MainProcessThread(QThread):
                 continue
             frame = self.main_process.process_frame()
             if frame is None:
+                self.changePixmap.emit(vars.EMPTY_IMAGE)
                 continue
             rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             h, w, ch = rgb_image.shape

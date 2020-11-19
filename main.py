@@ -1,4 +1,3 @@
-from Project.PedestrianCounter.Detecting import Detectors
 import sys
 import ctypes
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication
@@ -22,7 +21,7 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setWindowTitle(WINDOW_NAME)
-        self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
+        self.resize(WINDOW_WIDTH, WINDOW_HEIGHT)
         self.settings_layout = SettingsLayout()
         self.display_layout = DisplayLayout()
         self.main_process_thread = MainProcessThread()
@@ -39,6 +38,9 @@ class MainWindow(QMainWindow):
         detector_section = self.settings_layout.detector_tab_layout.first_section
         detector_section.changedDetectorName.connect(
             self.main_process_thread.main_process.set_detector
+        )
+        detector_section.changedSkipFrames.connect(
+            self.main_process_thread.main_process.set_frames_to_skip
         )
 
         ## Tracker Tab
