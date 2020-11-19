@@ -34,6 +34,7 @@ class MainWindow(QMainWindow):
         source_layout.resetCounting.connect(
             self.main_process_thread.main_process.counter.reset
         )
+
         ## Detector Tab
         detector_section = self.settings_layout.detector_tab_layout.first_section
         detector_section.changedDetectorName.connect(
@@ -42,11 +43,26 @@ class MainWindow(QMainWindow):
         detector_section.changedSkipFrames.connect(
             self.main_process_thread.main_process.set_frames_to_skip
         )
+        detector_section.changedHorizontal.connect(
+            self.main_process_thread.main_process.set_horizontal
+        )
 
         ## Tracker Tab
         tracker_section = self.settings_layout.tracker_tab_layout.first_section
         tracker_section.changedTrackerName.connect(
             self.main_process_thread.main_process.set_tracker
+        )
+
+        ## Counter Tab
+        counter_section = self.settings_layout.counter_tab_layout.first_section
+        counter_section.changedMargin.connect(
+            self.main_process_thread.main_process.set_margin
+        )
+        counter_section.changedMinUpdate.connect(
+            self.main_process_thread.main_process.counter.set_min_update_time
+        )
+        counter_section.changedVectorLen.connect(
+            self.main_process_thread.main_process.set_vector_len
         )
 
         # Display Layout

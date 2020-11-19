@@ -23,5 +23,7 @@ class GSpinBox(QObject):
 
         self.widget.valueChanged.connect(self.changedValue.emit)
 
+        return self.widget
+
     def get_buddy(self, name=""):
         return QLabel(name)

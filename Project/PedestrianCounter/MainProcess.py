@@ -30,6 +30,7 @@ class MainProcess:
         self.total_frames = 0
         self.frames_to_skip = 6
         self.margin = 0
+        self.vector_len = 16
 
         self.detector_dict = Detectors().DICT
         self.tracker_dict = Trackers().DICT
@@ -45,7 +46,15 @@ class MainProcess:
 
     def set_margin(self, margin):
         self.margin = margin
-        self.counter.setMargin(margin)
+        self.counter.set_margin(margin)
+
+    def set_vector_len(self, len):
+        self.vector_len = len
+
+    def set_horizontal(self, horizontal):
+        print(horizontal)
+        self.horizontal = horizontal
+        self.counter.set_horizontal(horizontal)
 
     def set_detector(self, detector_name):
         self.change_detector = True
@@ -172,7 +181,7 @@ class MainProcess:
             cv2.line(
                 frame,
                 centroid,
-                person.get_movement_vector(),
+                person.get_movement_vector(self.vector_len),
                 (0, 255, 0),
                 2,
             )
