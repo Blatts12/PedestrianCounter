@@ -17,6 +17,7 @@ class SourceLayout(QFormLayout):
     changedSourceIndex = pyqtSignal(int)
     changedSource = pyqtSignal(str)
     changedPause = pyqtSignal(bool)
+    stopClicked = pyqtSignal()
     resetCounting = pyqtSignal()
 
     def _changed_source(self):
@@ -40,11 +41,14 @@ class SourceLayout(QFormLayout):
         self.pause_button.phaseChanged.connect(self.changedPause.emit)
         self.reset_button = QPushButton("Reset")
         self.reset_button.clicked.connect(self.resetCounting.emit)
+        self.stop_button = QPushButton("Stop")
+        self.stop_button.clicked.connect(self.stopClicked.emit)
 
         self.addRow(QLabel("Source:"), self.source_combo_box)
         self.addRow(self.change_button)
         self.addRow(QHLine())
         self.addRow(self.pause_button)
+        self.addRow(self.stop_button)
         self.addRow(QHLine())
         self.addRow(QLabel("Reset counting:"), self.reset_button)
 

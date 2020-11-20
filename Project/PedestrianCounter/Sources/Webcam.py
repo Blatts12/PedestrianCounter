@@ -15,6 +15,7 @@ class Webcam(ISource, IGeneratorBase):
 
     def __init__(self):
         self.cap = None
+        self.working = False
 
     def ready_for_start(self):
         if self.values["Webcam"].v == "":
@@ -23,6 +24,8 @@ class Webcam(ISource, IGeneratorBase):
         return True
 
     def read_frame(self):
+        if not self.working:
+            return None
         ret, frame = self.cap.read()
         if not ret:
             self.stop_cap()
@@ -33,8 +36,10 @@ class Webcam(ISource, IGeneratorBase):
         self.cap = cv2.VideoCapture(int(self.values["Webcam"].v), cv2.CAP_DSHOW)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        self.working = True
 
     def stop_cap(self):
+        self.working = False
         if self.cap is not None:
             self.cap.release()
             self.cap = None

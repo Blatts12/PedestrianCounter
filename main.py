@@ -31,6 +31,7 @@ class MainWindow(QMainWindow):
         source_layout = self.settings_layout.main_tab_layout.source_layout
         source_layout.changedSource.connect(self.change_source)
         source_layout.changedPause.connect(self.main_process_thread.pause)
+        source_layout.stopClicked.connect(self.main_process_thread.stop_source)
         source_layout.resetCounting.connect(
             self.main_process_thread.main_process.counter.reset
         )

@@ -29,12 +29,17 @@ class FileVideo(ISource, IGeneratorBase):
         if not self.working:
             return None
         ret, frame = self.cap.read()
-        if not ret and self.values["Loop"].v:
-            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            ret, frame = self.cap.read()
-            if not ret:
+        if not ret:
+            if not self.values["Loop"].v:
                 self.stop_cap()
                 return None
+            else:
+                self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                ret, frame = self.cap.read()
+                if not ret:
+                    self.stop_cap()
+                    return None
+
         return frame
 
     def start_cap(self):

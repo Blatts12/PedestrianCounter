@@ -13,7 +13,9 @@ class SettingsFormGenerator:
                     widget = value_holder.widget
 
                     if widget.has_buddy:
-                        layout.addRow(widget.get_buddy(value_name), widget.get_widget())
+                        layout.addRow(
+                            widget.get_buddy(value_name + ":"), widget.get_widget()
+                        )
                     else:
                         layout.addRow(widget.get_widget())
 

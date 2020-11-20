@@ -233,6 +233,10 @@ class MainProcessThread(QThread):
     def stop(self):
         self.working = False
 
+    def stop_source(self):
+        self.main_process_paused = True
+        self.main_process.stop()
+
     def pause(self, pause):
         self.paused = pause
 
@@ -251,6 +255,9 @@ class MainProcessThread(QThread):
                 rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888
             )
             p = convert_to_qt_format.scaled(640, 480, Qt.KeepAspectRatio)
-            self.changePixmap.emit(p)
+            if self.main_process_paused:
+                self.changePixmap.emit(vars.EMPTY_IMAGE)
+            else:
+                self.changePixmap.emit(p)
 
         self.main_process.stop()
