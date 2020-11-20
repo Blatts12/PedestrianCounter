@@ -52,7 +52,6 @@ class MainProcess:
         self.vector_len = len
 
     def set_horizontal(self, horizontal):
-        print(horizontal)
         self.horizontal = horizontal
         self.counter.set_horizontal(horizontal)
 
@@ -203,7 +202,11 @@ class MainProcess:
         self.draw_margin_lines(frame, frame_width, frame_height)
 
         self.new_frame_time = time.time()
-        fps = 1 / (self.new_frame_time - self.prev_frame_time)
+        dif = self.new_frame_time - self.prev_frame_time
+        if dif == 0:
+            fps = 0
+        else:
+            fps = 1 / dif
         self.prev_frame_time = self.new_frame_time
         fps = str(int(fps))
         cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)

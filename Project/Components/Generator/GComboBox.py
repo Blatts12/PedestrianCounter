@@ -5,7 +5,7 @@ from Project.Components.Generator.IGeneratorComponent import IGeneratorComponent
 
 
 class GComboBox(QObject):
-    changedValue = pyqtSignal(str)
+    changedValue = pyqtSignal(int)
     has_buddy = True
 
     def __init__(self, values, placeholder=""):
