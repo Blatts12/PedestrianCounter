@@ -43,8 +43,13 @@ class FileVideo(ISource, IGeneratorBase):
         return frame
 
     def start_cap(self):
-        self.cap = cv2.VideoCapture(self.values["File"].v)
-        self.working = True
+        try:
+            self.cap = cv2.VideoCapture(self.values["File"].v)
+            self.working = True
+        except Exception as e:
+            self.working = False
+            QMessageBox.warning(None, "Video", "Can't open video file")
+            print(e)
 
     def stop_cap(self):
         self.working = False

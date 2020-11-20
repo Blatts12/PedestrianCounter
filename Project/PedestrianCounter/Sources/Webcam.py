@@ -33,10 +33,15 @@ class Webcam(ISource, IGeneratorBase):
         return frame
 
     def start_cap(self):
-        self.cap = cv2.VideoCapture(int(self.values["Webcam"].v), cv2.CAP_DSHOW)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        self.working = True
+        try:
+            self.cap = cv2.VideoCapture(int(self.values["Webcam"].v), cv2.CAP_DSHOW)
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            self.working = True
+        except Exception as e:
+            self.working = False
+            QMessageBox.warning(None, "Webcam", "Can't open webcam")
+            print(e)
 
     def stop_cap(self):
         self.working = False

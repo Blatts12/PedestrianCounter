@@ -36,8 +36,8 @@ class IPCam(ISource, IGeneratorBase):
             self.cap = cv2.VideoCapture(self.values["IP"].v)
             self.working = True
         except Exception as e:
-            QMessageBox.warning(None, "IP Cam", "Can't connect to camera")
             self.working = False
+            QMessageBox.warning(None, "IP Cam", "Can't connect to camera")
             print(e)
 
     def stop_cap(self):
