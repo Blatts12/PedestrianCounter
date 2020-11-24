@@ -53,6 +53,12 @@ class MainWindow(QMainWindow):
         tracker_section.changedTrackerName.connect(
             self.main_process_thread.main_process.set_tracker
         )
+        tracker_section.changedMaxDistance.connect(
+            self.main_process_thread.main_process.centroid_tracker.set_max_distance
+        )
+        tracker_section.changedMaxDisappearance.connect(
+            self.main_process_thread.main_process.centroid_tracker.set_max_disappearance
+        )
 
         ## Counter Tab
         counter_section = self.settings_layout.counter_tab_layout.first_section

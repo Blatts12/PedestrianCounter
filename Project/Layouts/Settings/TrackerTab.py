@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import (
     QComboBox,
     QGridLayout,
+    QSpinBox,
     QStackedLayout,
     QFormLayout,
     QLabel,
@@ -8,11 +9,14 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import QMargins, pyqtSignal
 from Project.PedestrianCounter.Tracking import Trackers
+from Project.Components.QHLine import QHLine
 
 
 class FirstSection(QFormLayout):
     changedTrackerIndex = pyqtSignal(int)
     changedTrackerName = pyqtSignal(str)
+    changedMaxDistance = pyqtSignal(int)
+    changedMaxDisappearance = pyqtSignal(int)
 
     def __init__(self, trackers, *args, **kwargs):
         super(FirstSection, self).__init__(*args, **kwargs)
@@ -23,7 +27,25 @@ class FirstSection(QFormLayout):
         )
         self.tracker_combo_box.currentTextChanged.connect(self.changedTrackerName.emit)
 
-        self.addRow(QLabel("Tracker:"), self.tracker_combo_box)
+        self.max_distance_spinbox = QSpinBox()
+        self.max_distance_spinbox.setRange(1, 512)
+        self.max_distance_spinbox.setSingleStep(1)
+        self.max_distance_spinbox.setValue(36)
+        self.max_distance_spinbox.valueChanged.connect(self.changedMaxDistance.emit)
+
+        self.max_disappearance_spinbox = QSpinBox()
+        self.max_disappearance_spinbox.setRange(1, 512)
+        self.max_disappearance_spinbox.setSingleStep(1)
+        self.max_disappearance_spinbox.setValue(36)
+        self.max_disappearance_spinbox.valueChanged.connect(
+            self.changedMaxDisappearance.emit
+        )
+
+        self.addRow("Tracker:", self.tracker_combo_box)
+        self.addRow(QHLine())
+        self.addRow(QLabel("Centroid Tracker"))
+        self.addRow("Max distance: ", self.max_distance_spinbox)
+        self.addRow("Max disappearance: ", self.max_disappearance_spinbox)
 
 
 class TrackerTabLayout(QGridLayout):
