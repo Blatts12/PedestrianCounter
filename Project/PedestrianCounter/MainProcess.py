@@ -139,6 +139,18 @@ class MainProcess:
                 2,
             )
 
+    def draw_counter(self, frame, frame_height, frame_width):
+        text = "Crossed: {}".format(self.counter.get_crossed())
+        cv2.putText(
+            frame,
+            text,
+            (10, frame_height - 10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            (0, 0, 255),
+            2,
+        )
+
     def process_frame(self):
         frame = self.source.read_frame()
         if frame is None:
@@ -187,17 +199,7 @@ class MainProcess:
 
             self.counter.process_person(person, frame_width, frame_height)
 
-        text = "UP: {}, DOWN: {}".format(self.counter.up, self.counter.down)
-        cv2.putText(
-            frame,
-            text,
-            (10, frame_height - 10),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.6,
-            (0, 0, 255),
-            2,
-        )
-
+        self.draw_counter(frame, frame_height, frame_width)
         self.draw_counting_line(frame, frame_width, frame_height)
         self.draw_margin_lines(frame, frame_width, frame_height)
 

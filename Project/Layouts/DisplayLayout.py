@@ -1,10 +1,8 @@
-from PyQt5.QtWidgets import QGridLayout
-from PyQt5.QtCore import QMargins
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtCore import Qt
 
 
-class DisplayLayout(QGridLayout):
+class DisplayLayout(QHBoxLayout):
     def __init__(self, *args, **kwargs):
         super(DisplayLayout, self).__init__(*args, **kwargs)
-        self.setColumnStretch(0, 500)
-        self.setColumnStretch(1, 300)
-        self.setContentsMargins(QMargins(20, 0, 0, 0))
+        self.setAlignment(Qt.AlignCenter)

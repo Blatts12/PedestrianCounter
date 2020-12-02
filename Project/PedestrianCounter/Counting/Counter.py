@@ -11,6 +11,7 @@ class Counter:
         self.min_update_time = min_update_time
         self.up = 0  # or right
         self.down = 0  # or left
+        self.inverted = False
 
     def reset(self):
         self.up = 0
@@ -25,11 +26,13 @@ class Counter:
     def set_horizontal(self, horizontal):
         self.horizontal = horizontal
 
-    def get_inside_up(self):
-        return self.up - self.down
+    def set_inverted(self, inverted):
+        self.inverted = inverted
 
-    def get_inside_down(self):
-        return self.down - self.up
+    def get_crossed(self):
+        if self.inverted:
+            return self.down - self.up
+        return self.up - self.down
 
     def process_person(self, person, frame_width, frame_height):
         if self.horizontal:
@@ -52,7 +55,7 @@ class Counter:
                 and centroid[1] < half_width
                 and centroid[1] > self.margin
             ):
-                print("[{}]UP-MEAN_THETA: {}".format(person.id, mean_theta))
+                print("[{}]LEFT-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.up += 1
                 person.counted = True
 
@@ -62,7 +65,7 @@ class Counter:
                 and centroid[1] > half_width
                 and centroid[1] < frame_width - self.margin
             ):
-                print("[{}]DOWN-MEAN_THETA: {}".format(person.id, mean_theta))
+                print("[{}]RIGHT-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.down += 1
                 person.counted = True
 

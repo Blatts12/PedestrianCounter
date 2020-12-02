@@ -5,7 +5,6 @@ from Project.Layouts.MainLayout import MainLayout
 from Project.Layouts.SettingsLayout import SettingsLayout
 from Project.Layouts.DisplayLayout import DisplayLayout
 from Project.Layouts.ImageViewerLayout import ImageViewerLayout
-from Project.Layouts.InfoLayout import InfoLayout
 from Project.Components.OpenCVImageViewer import OpenCVImageViewer
 from Project.PedestrianCounter.MainProcess import MainProcessThread
 
@@ -13,7 +12,7 @@ if sys.platform == "win32":
     app_id = u"jakubmelkowski.pedestriancounter"
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
 
-WINDOW_WIDTH, WINDOW_HEIGHT = 1000, 800
+WINDOW_WIDTH, WINDOW_HEIGHT = 800, 700
 WINDOW_NAME = "Pedestrian Counter"
 
 
@@ -71,15 +70,18 @@ class MainWindow(QMainWindow):
         counter_section.changedVectorLen.connect(
             self.main_process_thread.main_process.set_vector_len
         )
+        counter_section.changedInverted.connect(
+            self.main_process_thread.main_process.counter.set_inverted
+        )
 
         # Display Layout
         self.image_viewer = OpenCVImageViewer()
         self.main_process_thread.changePixmap.connect(self.image_viewer.set_image)
 
-        self.info_layout = InfoLayout()
         self.image_viewer_layout = ImageViewerLayout(self.image_viewer)
-        self.display_layout.addLayout(self.image_viewer_layout, 0, 0)
-        self.display_layout.addLayout(self.info_layout, 0, 1)
+        self.display_layout.addStretch()
+        self.display_layout.addLayout(self.image_viewer_layout)
+        self.display_layout.addStretch()
 
         main_layout = MainLayout()
         main_layout.addLayout(self.settings_layout, 0, 0)
