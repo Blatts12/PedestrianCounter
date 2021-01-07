@@ -178,10 +178,6 @@ class MainProcess:
         frame_height, frame_width = frame.shape[:2]
         boxes = []
 
-        if self.start_motion_vector:
-            self.motion_vector = MotionVector(frame)
-            self.start_motion_vector = False
-
         if self.total_frames % self.frames_to_skip == 0:
             if self.change_detector:
                 self.activate_detector()
@@ -197,11 +193,12 @@ class MainProcess:
         else:
             boxes = self.tracker.update_trackers(frame)
 
-        objects = self.centroid_tracker.update(boxes)
+        objects, new_points = self.centroid_tracker.update(boxes)
 
         for person in objects:
             centroid = tuple(person.get_centroid())
 
+            # if not self.calc_motion_vector:
             cv2.circle(frame, centroid, 4, (0, 255, 0), -1)
             cv2.putText(
                 frame,
@@ -221,14 +218,33 @@ class MainProcess:
                 2,
             )
 
+            if self.calc_motion_vector and len(person.centroids) > 1:
+                centroids = list(person.centroids)
+                centroid_old = tuple(centroids.pop(1))
+                for c in centroids:
+                    centroid_new = tuple(c)
+                    cv2.line(
+                        frame,
+                        centroid_old,
+                        centroid_new,
+                        (20, 130, 120),
+                        2,
+                    )
+                    centroid_old = centroid_new
+
             self.counter.process_person(person, frame_width, frame_height)
 
-        if self.calc_motion_vector and not self.start_motion_vector:
-            frame = self.motion_vector.process_frame(frame)
-        else:
-            self.draw_counter(frame, frame_height, frame_width)
-            self.draw_counting_line(frame, frame_width, frame_height)
-            self.draw_margin_lines(frame, frame_width, frame_height)
+        # if self.start_motion_vector:
+        #     self.motion_vector = MotionVector(frame, new_points)
+        #     self.start_motion_vector = False
+
+        # if self.calc_motion_vector and not self.start_motion_vector:
+        #     frame = self.motion_vector.process_frame(frame, new_points)
+        # else:
+
+        self.draw_counter(frame, frame_height, frame_width)
+        self.draw_counting_line(frame, frame_width, frame_height)
+        self.draw_margin_lines(frame, frame_width, frame_height)
 
         self.draw_fps(frame)
 
