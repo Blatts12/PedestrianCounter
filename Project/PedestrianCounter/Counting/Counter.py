@@ -48,6 +48,8 @@ class Counter:
 
         half_width = frame_width // 2
 
+        # print("D: {}, MT: {}".format(direction, mean_theta))
+
         if not person.counted and person.update_time > self.min_update_time:
             if (
                 direction < 0
@@ -55,7 +57,7 @@ class Counter:
                 and centroid[1] < half_width
                 and centroid[1] > self.margin
             ):
-                print("[{}]LEFT-MEAN_THETA: {}".format(person.id, mean_theta))
+                # print("[{}]LEFT-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.up += 1
                 person.counted = True
 
@@ -65,7 +67,7 @@ class Counter:
                 and centroid[1] > half_width
                 and centroid[1] < frame_width - self.margin
             ):
-                print("[{}]RIGHT-MEAN_THETA: {}".format(person.id, mean_theta))
+                # print("[{}]RIGHT-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.down += 1
                 person.counted = True
 
@@ -76,6 +78,8 @@ class Counter:
         mean_theta = 0 if not person.theta else np.mean(person.theta)
         half_height = frame_height // 2
 
+        # print("D: {}, MT: {}".format(direction, mean_theta))
+
         if not person.counted and person.update_time > self.min_update_time:
             if (
                 direction < 0
@@ -83,7 +87,7 @@ class Counter:
                 and centroid[1] < half_height
                 and centroid[1] > self.margin
             ):
-                print("[{}]UP-MEAN_THETA: {}".format(person.id, mean_theta))
+                # print("[{}]UP-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.up += 1
                 person.counted = True
 
@@ -93,6 +97,6 @@ class Counter:
                 and centroid[1] > half_height
                 and centroid[1] < frame_height - self.margin
             ):
-                print("[{}]DOWN-MEAN_THETA: {}".format(person.id, mean_theta))
+                # print("[{}]DOWN-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.down += 1
                 person.counted = True

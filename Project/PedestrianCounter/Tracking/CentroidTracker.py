@@ -24,6 +24,7 @@ class TrackedObject:
     def get_direction(self):
         return self.centroids[0][1] - self.centroids[-1][1]
 
+    # get_directional_vector
     def get_movement_vector(self, length=18):
         (x1, y1) = self.centroids[0]
         (x2, y2) = self.centroids[-1]

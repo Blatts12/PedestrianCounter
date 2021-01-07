@@ -1,3 +1,4 @@
+from Project.PedestrianCounter.MotionVector import MotionVector
 import cv2
 import time
 import vars
@@ -41,6 +42,10 @@ class MainProcess:
         self.prev_frame_time = 0
         self.new_frame_time = 0
 
+        self.calc_motion_vector = False
+        self.start_motion_vector = False
+        self.motion_vector = None
+
     def set_frames_to_skip(self, frames=6):
         self.frames_to_skip = frames
 
@@ -77,6 +82,10 @@ class MainProcess:
         self.stop()
         self.sources[name][0].start_cap()
         self.source = self.sources[name][0]
+
+    def change_motion_vector(self, activate):
+        self.start_motion_vector = activate
+        self.calc_motion_vector = activate
 
     def reset(self):
         if self.source is not None:
@@ -151,12 +160,27 @@ class MainProcess:
             2,
         )
 
+    def draw_fps(self, frame):
+        self.new_frame_time = time.time()
+        dif = self.new_frame_time - self.prev_frame_time
+        if dif == 0:
+            fps = 0
+        else:
+            fps = 1 / dif
+        self.prev_frame_time = self.new_frame_time
+        fps = str(int(fps))
+        cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
     def process_frame(self):
         frame = self.source.read_frame()
         if frame is None:
             return None
         frame_height, frame_width = frame.shape[:2]
         boxes = []
+
+        if self.start_motion_vector:
+            self.motion_vector = MotionVector(frame)
+            self.start_motion_vector = False
 
         if self.total_frames % self.frames_to_skip == 0:
             if self.change_detector:
@@ -199,19 +223,14 @@ class MainProcess:
 
             self.counter.process_person(person, frame_width, frame_height)
 
-        self.draw_counter(frame, frame_height, frame_width)
-        self.draw_counting_line(frame, frame_width, frame_height)
-        self.draw_margin_lines(frame, frame_width, frame_height)
-
-        self.new_frame_time = time.time()
-        dif = self.new_frame_time - self.prev_frame_time
-        if dif == 0:
-            fps = 0
+        if self.calc_motion_vector and not self.start_motion_vector:
+            frame = self.motion_vector.process_frame(frame)
         else:
-            fps = 1 / dif
-        self.prev_frame_time = self.new_frame_time
-        fps = str(int(fps))
-        cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            self.draw_counter(frame, frame_height, frame_width)
+            self.draw_counting_line(frame, frame_width, frame_height)
+            self.draw_margin_lines(frame, frame_width, frame_height)
+
+        self.draw_fps(frame)
 
         self.total_frames += 1
 

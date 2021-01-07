@@ -13,6 +13,7 @@ class FirstSection(QFormLayout):
     changedVectorLen = pyqtSignal(int)
     changedMinUpdate = pyqtSignal(int)
     changedInverted = pyqtSignal(bool)
+    changedMotion = pyqtSignal(bool)
 
     def __init__(self, *args, **kwargs):
         super(FirstSection, self).__init__(*args, **kwargs)
@@ -20,16 +21,19 @@ class FirstSection(QFormLayout):
         self.margin_slider = GSlider(0, 100, 0, "%")
         self.minimum_update_spinbox = GSpinBox(0, 255, 3, 1)
         self.count_inverted = GCheckBox("Enter direction (unchecked = up/left)")
+        self.motion_vector = GCheckBox("Motion vector")
 
         self.vector_len_slider.changedValue.connect(self.changedVectorLen.emit)
         self.margin_slider.changedValue.connect(self.changedMargin.emit)
         self.minimum_update_spinbox.changedValue.connect(self.changedMinUpdate)
         self.count_inverted.changedValue.connect(self.changedInverted)
+        self.motion_vector.changedValue.connect(self.changedMotion)
 
         self.addRow("Vector Length:", self.vector_len_slider.get_widget())
         self.addRow("Margin:", self.margin_slider.get_widget())
         self.addRow("Minium updates:", self.minimum_update_spinbox.get_widget())
         self.addRow(self.count_inverted.get_widget())
+        self.addRow(self.motion_vector.get_widget())
 
 
 class CounterTabLayout(QGridLayout):

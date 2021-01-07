@@ -73,6 +73,9 @@ class MainWindow(QMainWindow):
         counter_section.changedInverted.connect(
             self.main_process_thread.main_process.counter.set_inverted
         )
+        counter_section.changedMotion.connect(
+            self.main_process_thread.main_process.change_motion_vector
+        )
 
         # Display Layout
         self.image_viewer = OpenCVImageViewer()
