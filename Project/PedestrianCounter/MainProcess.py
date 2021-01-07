@@ -1,4 +1,3 @@
-from Project.PedestrianCounter.MotionVector import MotionVector
 import cv2
 import time
 import vars
@@ -42,9 +41,7 @@ class MainProcess:
         self.prev_frame_time = 0
         self.new_frame_time = 0
 
-        self.calc_motion_vector = False
-        self.start_motion_vector = False
-        self.motion_vector = None
+        self.motion_vector = False
 
     def set_frames_to_skip(self, frames=6):
         self.frames_to_skip = frames
@@ -84,8 +81,7 @@ class MainProcess:
         self.source = self.sources[name][0]
 
     def change_motion_vector(self, activate):
-        self.start_motion_vector = activate
-        self.calc_motion_vector = activate
+        self.motion_vector = activate
 
     def reset(self):
         if self.source is not None:
@@ -171,6 +167,29 @@ class MainProcess:
         fps = str(int(fps))
         cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
+    def draw_motion_vector(self, frame, centroid, person):
+        cv2.line(
+            frame,
+            centroid,
+            person.get_movement_vector(self.vector_len),
+            (0, 255, 0),
+            2,
+        )
+
+        if self.motion_vector and len(person.centroids) > 1:
+            centroids = list(person.centroids)
+            centroid_old = tuple(centroids.pop(1))
+            for c in centroids:
+                centroid_new = tuple(c)
+                cv2.line(
+                    frame,
+                    centroid_old,
+                    centroid_new,
+                    (20, 130, 120),
+                    2,
+                )
+                centroid_old = centroid_new
+
     def process_frame(self):
         frame = self.source.read_frame()
         if frame is None:
@@ -198,7 +217,6 @@ class MainProcess:
         for person in objects:
             centroid = tuple(person.get_centroid())
 
-            # if not self.calc_motion_vector:
             cv2.circle(frame, centroid, 4, (0, 255, 0), -1)
             cv2.putText(
                 frame,
@@ -210,37 +228,10 @@ class MainProcess:
                 2,
             )
 
-            cv2.line(
-                frame,
-                centroid,
-                person.get_movement_vector(self.vector_len),
-                (0, 255, 0),
-                2,
-            )
-
-            if self.calc_motion_vector and len(person.centroids) > 1:
-                centroids = list(person.centroids)
-                centroid_old = tuple(centroids.pop(1))
-                for c in centroids:
-                    centroid_new = tuple(c)
-                    cv2.line(
-                        frame,
-                        centroid_old,
-                        centroid_new,
-                        (20, 130, 120),
-                        2,
-                    )
-                    centroid_old = centroid_new
+            if self.motion_vector:
+                self.draw_motion_vector(frame, centroid, person)
 
             self.counter.process_person(person, frame_width, frame_height)
-
-        # if self.start_motion_vector:
-        #     self.motion_vector = MotionVector(frame, new_points)
-        #     self.start_motion_vector = False
-
-        # if self.calc_motion_vector and not self.start_motion_vector:
-        #     frame = self.motion_vector.process_frame(frame, new_points)
-        # else:
 
         self.draw_counter(frame, frame_height, frame_width)
         self.draw_counting_line(frame, frame_width, frame_height)
