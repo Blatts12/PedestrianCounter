@@ -212,7 +212,7 @@ class MainProcess:
         else:
             boxes = self.tracker.update_trackers(frame)
 
-        objects, new_points = self.centroid_tracker.update(boxes)
+        objects = self.centroid_tracker.update(boxes)
 
         for person in objects:
             centroid = tuple(person.get_centroid())

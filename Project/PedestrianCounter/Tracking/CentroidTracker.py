@@ -68,15 +68,13 @@ class CentroidTracker:
         del self.tracked_objects[object_id]
 
     def update(self, rects):
-        new_points = []
-
         if len(rects) == 0:
             for object_id in list(self.tracked_objects.keys()):
                 self.tracked_objects[object_id].disappear += 1
                 if self.tracked_objects[object_id].disappear > self.max_disappearance:
                     self.deregister(object_id)
 
-            return list(self.tracked_objects.values()), new_points
+            return list(self.tracked_objects.values())
 
         input_centroids = np.zeros((len(rects), 2), dtype="int")
         for (i, (start_x, start_y, end_x, end_y)) in enumerate(rects):
@@ -87,7 +85,6 @@ class CentroidTracker:
         if len(self.tracked_objects) == 0:
             for i in range(len(input_centroids)):
                 self.register(input_centroids[i])
-                new_points.append(input_centroids[i])
 
         else:
             object_ids = list(self.tracked_objects.keys())
@@ -133,6 +130,5 @@ class CentroidTracker:
             else:
                 for col in unused_cols:
                     self.register(input_centroids[col])
-                    new_points.append(input_centroids[col])
 
-        return list(self.tracked_objects.values()), new_points
+        return list(self.tracked_objects.values())
