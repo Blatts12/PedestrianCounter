@@ -16,7 +16,7 @@ class GComboBox(QObject):
 
     def get_widget(self):
         self.widget = QComboBox()
-        # self.widget.setPlaceholderText(self.placeholder)
+        self.widget.setPlaceholderText(self.placeholder)
 
         if type(self.values) is str:
             self.widget.addItem(self.values)

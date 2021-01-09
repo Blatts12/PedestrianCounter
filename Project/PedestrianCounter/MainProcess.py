@@ -1,3 +1,4 @@
+import datetime
 import cv2
 import time
 import vars
@@ -38,8 +39,11 @@ class MainProcess:
         self.set_tracker(Trackers().get_first())
         self.set_detector(Detectors().get_first())
 
-        self.prev_frame_time = 0
-        self.new_frame_time = 0
+        self.time_start = None
+        self.time_now = None
+        self.tick = 0
+        self.frame_counter = 0
+        self.fps = 0
 
         self.motion_vector = False
 
@@ -79,6 +83,10 @@ class MainProcess:
         self.stop()
         self.sources[name][0].start_cap()
         self.source = self.sources[name][0]
+        self.frame_counter = 0
+        self.total_frames = 0
+        self.tick = 0
+        self.time_start = time.time()
 
     def change_motion_vector(self, activate):
         self.motion_vector = activate
@@ -157,38 +165,47 @@ class MainProcess:
         )
 
     def draw_fps(self, frame):
-        self.new_frame_time = time.time()
-        dif = self.new_frame_time - self.prev_frame_time
-        if dif == 0:
-            fps = 0
-        else:
-            fps = 1 / dif
-        self.prev_frame_time = self.new_frame_time
-        fps = str(int(fps))
-        cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-    def draw_motion_vector(self, frame, centroid, person):
-        cv2.line(
+        self.frame_counter += 1
+        self.time_now = time.time()
+        if self.time_now - self.time_start - self.tick >= 0.5:
+            self.fps = self.frame_counter
+            self.tick += 1
+            self.frame_counter = 0
+        cv2.putText(
             frame,
-            centroid,
-            person.get_movement_vector(self.vector_len),
+            str(self.fps),
+            (10, 10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
             (0, 255, 0),
             2,
         )
 
-        if self.motion_vector and len(person.centroids) > 1:
-            centroids = list(person.centroids)
-            centroid_old = tuple(centroids.pop(1))
-            for c in centroids:
-                centroid_new = tuple(c)
-                cv2.line(
-                    frame,
-                    centroid_old,
-                    centroid_new,
-                    (20, 130, 120),
-                    2,
-                )
-                centroid_old = centroid_new
+    def draw_motion_vector(self, frame, centroid, person):
+        movement_vector = person.get_movement_vector(self.vector_len)
+
+        if self.motion_vector:
+            cv2.line(
+                frame,
+                centroid,
+                movement_vector,
+                (0, 255, 0),
+                2,
+            )
+
+            if self.motion_vector and len(person.centroids) > 1:
+                centroids = list(person.centroids)
+                centroid_old = tuple(centroids.pop(1))
+                for c in centroids:
+                    centroid_new = tuple(c)
+                    cv2.line(
+                        frame,
+                        centroid_old,
+                        centroid_new,
+                        (20, 130, 120),
+                        2,
+                    )
+                    centroid_old = centroid_new
 
     def process_frame(self):
         frame = self.source.read_frame()
@@ -227,10 +244,7 @@ class MainProcess:
                 (0, 255, 0),
                 2,
             )
-
-            if self.motion_vector:
-                self.draw_motion_vector(frame, centroid, person)
-
+            self.draw_motion_vector(frame, centroid, person)
             self.counter.process_person(person, frame_width, frame_height)
 
         self.draw_counter(frame, frame_height, frame_width)
@@ -255,6 +269,8 @@ class MainProcessThread(QThread):
         self.main_process = MainProcess()
 
     def change_source(self, cap_type):
+        if not self.main_process_paused:
+            self.stop_source()
         self.main_process.change_source(cap_type)
         self.main_process_paused = False
 
@@ -266,6 +282,10 @@ class MainProcessThread(QThread):
         self.main_process.stop()
 
     def pause(self, pause):
+        if not pause:
+            self.main_process.frame_counter = 0
+            self.main_process.tick = 0
+            self.main_process.time_start = time.time()
         self.paused = pause
 
     def run(self):
@@ -274,6 +294,7 @@ class MainProcessThread(QThread):
                 continue
             frame = self.main_process.process_frame()
             if frame is None:
+                self.stop_source()
                 self.changePixmap.emit(vars.EMPTY_IMAGE)
                 continue
             rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)

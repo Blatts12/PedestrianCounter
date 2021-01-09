@@ -8,7 +8,7 @@ class Detectors(metaclass=Singleton):
     def __init__(self):
         generator = SettingsFormGenerator()
         self.DICT = {
-            "MobileNet SDD": generator.generate(MobileNetSSD()),
+            "MobileNet SSD": generator.generate(MobileNetSSD()),
             "YoloV4-tiny": generator.generate(YoloV4Tiny()),
         }
 
