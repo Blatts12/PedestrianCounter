@@ -48,9 +48,13 @@ class MainProcess:
         self.motion_vector = False
 
         self.benchmark = Benchmark()
+        self.test_name = ""
 
     def set_frames_to_skip(self, frames=6):
         self.frames_to_skip = frames
+
+    def set_test_name(self, name):
+        self.test_name = name
 
     def set_margin(self, margin):
         self.margin = margin
@@ -169,7 +173,7 @@ class MainProcess:
         self.fps = 1 / self.frame_time
         cv2.putText(
             frame,
-            str(self.fps),
+            str(int(self.fps)),
             (10, 10),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
@@ -297,7 +301,7 @@ class MainProcessThread(QThread):
                 continue
             frame = self.main_process.process_frame()
             if frame is None:
-                self.main_process.benchmark.save_to_file("test")
+                self.main_process.benchmark.save_to_file(self.main_process.test_name)
                 self.stop_source()
                 self.changePixmap.emit(vars.EMPTY_IMAGE)
                 continue

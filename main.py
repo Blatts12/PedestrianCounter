@@ -76,6 +76,9 @@ class MainWindow(QMainWindow):
         counter_section.changedMotion.connect(
             self.main_process_thread.main_process.change_motion_vector
         )
+        counter_section.changedTest.connect(
+            self.main_process_thread.main_process.set_test_name
+        )
 
         # Display Layout
         self.image_viewer = OpenCVImageViewer()
