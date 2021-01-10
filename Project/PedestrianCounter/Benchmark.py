@@ -1,5 +1,6 @@
 import csv
 import json
+import time
 import numpy as np
 
 
@@ -10,6 +11,8 @@ class Benchmark:
         self.disappeared = []
         self.up = []
         self.down = []
+        self.time_start = 0
+        self.time_end = 0
 
         self.scores_dict = {}
         self.scores_dict["scores"] = []
@@ -45,6 +48,7 @@ class Benchmark:
         self.up = []
         self.down = []
         print("BENCHMARK DONE")
+        self.time_start = time.perf_counter()
 
     def calculate(self, name):
         one_len = round(len(self.fps) / 100)
@@ -62,6 +66,8 @@ class Benchmark:
         final_down = self.down[-1]
         final_crossed = final_up - final_down
 
+        self.time_end = time.perf_counter()
+
         scores = {
             "test_name": name,
             "mean_fps": mean_fps,
@@ -72,6 +78,7 @@ class Benchmark:
             "down": final_down,
             "crossed": final_crossed,
             "disappeared": final_disappeared,
+            "time": self.time_end - self.time_start,
         }
 
         self.scores_dict["scores"].append(scores)

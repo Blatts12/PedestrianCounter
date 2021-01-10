@@ -8,6 +8,8 @@ class BenchmarkManager:
         self.benchmarks = None
 
         self.detectors = ["MobileNet SSD", "YoloV4-tiny"]
+        if not os.path.exists("Tests/CSV"):
+            os.mkdir("Tests/CSV")
 
         with open(file_name) as json_file:
             data = json.load(json_file)

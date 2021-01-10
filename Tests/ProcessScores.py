@@ -1,8 +1,6 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import rc
-import pandas as pd
 
 
 class Data:
@@ -16,9 +14,12 @@ class Data:
         self.up = []
         self.down = []
         self.disappeared = []
+        self.time = []
         self.bar_width = 0.75
 
         for score in scores:
+            if score["test_name"] == "":
+                continue
             self.r.append(int(score["test_name"]))
             self.names.append(score["test_name"])
             self.mean_fps_bar.append(score["mean_fps"] - score["mean_1low_fps"])
@@ -30,6 +31,7 @@ class Data:
             self.up.append(score["up"])
             self.down.append(score["down"])
             self.disappeared.append(score["disappeared"])
+            self.time.append(score["time"])
 
 
 def draw_mean_fps_chart(data: Data):
@@ -129,6 +131,24 @@ def draw_crossed(data: Data):
     plt.savefig("Crossed.png")
 
 
+def draw_time(data: Data):
+    plt.clf()
+    plt.figure(figsize=(12, 5))
+    plt.bar(
+        data.r,
+        data.time,
+        color="#e8e78e",
+        edgecolor="white",
+        width=data.bar_width,
+    )
+
+    plt.xticks(data.r, data.names)
+    plt.xlabel("Test ID")
+    plt.ylabel("Time (s)")
+
+    plt.savefig("Time.png")
+
+
 data = None
 
 with open("Tests\scores.json") as scores_file:
@@ -139,3 +159,4 @@ with open("Tests\scores.json") as scores_file:
 draw_mean_fps_chart(data)
 draw_mean_fps_time_chart(data)
 draw_crossed(data)
+draw_time(data)
