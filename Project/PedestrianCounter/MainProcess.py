@@ -39,11 +39,10 @@ class MainProcess:
         self.set_tracker(Trackers().get_first())
         self.set_detector(Detectors().get_first())
 
-        self.time_start = None
-        self.time_now = None
-        self.tick = 0
-        self.frame_counter = 0
         self.fps = 0
+        self.frame_time_start = 0
+        self.frame_time_end = 0
+        self.frame_time = 0
 
         self.motion_vector = False
 
@@ -79,23 +78,16 @@ class MainProcess:
         self.tracker = self.tracker_dict[self.new_tracker_name][0]
 
     def change_source(self, name):
-        self.reset()
         self.stop()
+        self.counter.reset()
+        self.centroid_tracker.reset()
+        self.total_frames = 0
         self.sources[name][0].start_cap()
         self.source = self.sources[name][0]
-        self.frame_counter = 0
-        self.total_frames = 0
-        self.tick = 0
-        self.time_start = time.time()
+        self.frame_time_start = time.perf_counter()
 
     def change_motion_vector(self, activate):
         self.motion_vector = activate
-
-    def reset(self):
-        if self.source is not None:
-            self.counter.reset()
-            self.centroid_tracker.reset()
-            self.total_frames = 0
 
     def stop(self):
         if self.source is not None:
@@ -165,15 +157,12 @@ class MainProcess:
         )
 
     def draw_fps(self, frame):
-        self.frame_counter += 1
-        self.time_now = time.time()
-        if self.time_now - self.time_start - self.tick >= 0.5:
-            self.fps = self.frame_counter
-            self.tick += 1
-            self.frame_counter = 0
+        self.frame_time_end = time.perf_counter()
+        self.frame_time = self.frame_time_end - self.frame_time_start
+        self.fps = 1 / self.frame_time
         cv2.putText(
             frame,
-            str(self.fps),
+            str(int(self.fps)),
             (10, 10),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
@@ -213,8 +202,12 @@ class MainProcess:
             return None
         frame_height, frame_width = frame.shape[:2]
         boxes = []
+        if self.frames_to_skip == 0:
+            if self.change_detector:
+                self.activate_detector()
 
-        if self.total_frames % self.frames_to_skip == 0:
+            boxes = self.detector.process_frame(frame, frame_width, frame_height)
+        elif self.total_frames % self.frames_to_skip == 0:
             if self.change_detector:
                 self.activate_detector()
 
@@ -254,7 +247,7 @@ class MainProcess:
         self.draw_fps(frame)
 
         self.total_frames += 1
-
+        self.frame_time_start = self.frame_time_end
         return frame
 
 
@@ -283,9 +276,7 @@ class MainProcessThread(QThread):
 
     def pause(self, pause):
         if not pause:
-            self.main_process.frame_counter = 0
-            self.main_process.tick = 0
-            self.main_process.time_start = time.time()
+            self.frame_time_start = time.perf_counter()
         self.paused = pause
 
     def run(self):
