@@ -1,17 +1,6 @@
 {
 	"scores": [
 		{
-			"test_name": "",
-			"mean_fps": 197.58963813177309,
-			"mean_1low_fps": 14.032509219071678,
-			"mean_frame_time": 0.012922261730319561,
-			"mean_1low_frame_time": 0.1767064923076925,
-			"up": 3,
-			"down": 7,
-			"crossed": -4,
-			"disappeared": 1
-		},
-		{
 			"test_name": "0",
 			"mean_fps": 26.964392273245978,
 			"mean_1low_fps": 21.943470719643196,
