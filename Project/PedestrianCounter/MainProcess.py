@@ -40,14 +40,10 @@ class MainProcess:
         self.set_tracker(Trackers().get_first())
         self.set_detector(Detectors().get_first())
 
-        self.time_start = None
-        self.time_now = None
-        self.tick = 0
-        self.frame_counter = 0
         self.fps = 0
-
         self.frame_time_start = 0
         self.frame_time_end = 0
+        self.frame_time = 0
 
         self.motion_vector = False
 
@@ -89,10 +85,7 @@ class MainProcess:
         self.stop()
         self.sources[name][0].start_cap()
         self.source = self.sources[name][0]
-        self.frame_counter = 0
-        self.total_frames = 0
-        self.tick = 0
-        self.time_start = time.time()
+        self.frame_time_start = time.perf_counter()
 
     def change_motion_vector(self, activate):
         self.motion_vector = activate
@@ -171,12 +164,9 @@ class MainProcess:
         )
 
     def draw_fps(self, frame):
-        self.frame_counter += 1
-        self.time_now = time.time()
-        if self.time_now - self.time_start - self.tick >= 1:
-            self.fps = self.frame_counter
-            self.tick += 1
-            self.frame_counter = 0
+        self.frame_time_end = time.perf_counter()
+        self.frame_time = self.frame_time_end - self.frame_time_start
+        self.fps = 1 / self.frame_time
         cv2.putText(
             frame,
             str(self.fps),
@@ -261,12 +251,9 @@ class MainProcess:
 
         self.total_frames += 1
 
-        self.frame_time_end = time.perf_counter()
-        frame_time = self.frame_time_end - self.frame_time_start
-
         self.benchmark.add(
             self.fps,
-            frame_time,
+            self.frame_time,
             self.centroid_tracker.disappeared_counter,
             self.counter.up,
             self.counter.down,
@@ -291,7 +278,6 @@ class MainProcessThread(QThread):
             self.stop_source()
         self.main_process.change_source(cap_type)
         self.main_process_paused = False
-        self.main_process.frame_time_start = time.perf_counter()
 
     def stop(self):
         self.working = False
@@ -302,9 +288,7 @@ class MainProcessThread(QThread):
 
     def pause(self, pause):
         if not pause:
-            self.main_process.frame_counter = 0
-            self.main_process.tick = 0
-            self.main_process.time_start = time.time()
+            self.frame_time_start = time.perf_counter()
         self.paused = pause
 
     def run(self):

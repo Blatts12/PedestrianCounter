@@ -28,7 +28,6 @@ class Benchmark:
                         "Frame" if i == 0 else i,
                         self.fps[i],
                         self.frame_time[i],
-                        "FPS by FT" if i == 0 else 1 / self.frame_time[i],
                         self.disappeared[i],
                         self.up[i],
                         self.down[i],
