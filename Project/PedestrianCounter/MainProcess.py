@@ -1,3 +1,4 @@
+from Project.PedestrianCounter.Benchmark import Benchmark
 import datetime
 import cv2
 import time
@@ -45,7 +46,12 @@ class MainProcess:
         self.frame_counter = 0
         self.fps = 0
 
+        self.frame_time_start = 0
+        self.frame_time_end = 0
+
         self.motion_vector = False
+
+        self.benchmark = Benchmark()
 
     def set_frames_to_skip(self, frames=6):
         self.frames_to_skip = frames
@@ -167,7 +173,7 @@ class MainProcess:
     def draw_fps(self, frame):
         self.frame_counter += 1
         self.time_now = time.time()
-        if self.time_now - self.time_start - self.tick >= 0.5:
+        if self.time_now - self.time_start - self.tick >= 1:
             self.fps = self.frame_counter
             self.tick += 1
             self.frame_counter = 0
@@ -255,6 +261,18 @@ class MainProcess:
 
         self.total_frames += 1
 
+        self.frame_time_end = time.perf_counter()
+        frame_time = self.frame_time_end - self.frame_time_start
+
+        self.benchmark.add(
+            self.fps,
+            frame_time,
+            self.centroid_tracker.disappeared_counter,
+            self.counter.up,
+            self.counter.down,
+        )
+
+        self.frame_time_start = self.frame_time_end
         return frame
 
 
@@ -273,6 +291,7 @@ class MainProcessThread(QThread):
             self.stop_source()
         self.main_process.change_source(cap_type)
         self.main_process_paused = False
+        self.main_process.frame_time_start = time.perf_counter()
 
     def stop(self):
         self.working = False
@@ -294,6 +313,7 @@ class MainProcessThread(QThread):
                 continue
             frame = self.main_process.process_frame()
             if frame is None:
+                self.main_process.benchmark.save_to_file("test")
                 self.stop_source()
                 self.changePixmap.emit(vars.EMPTY_IMAGE)
                 continue
