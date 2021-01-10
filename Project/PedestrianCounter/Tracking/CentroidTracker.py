@@ -57,6 +57,7 @@ class CentroidTracker:
 
     def reset(self):
         self.next_object_id = 0
+        self.disappeared_counter = 0
         self.tracked_objects = OrderedDict()
 
     def register(self, centroid):

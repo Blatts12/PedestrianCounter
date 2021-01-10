@@ -1,3 +1,4 @@
+from Project.PedestrianCounter.BenchmarkManager import BenchmarkManager
 from Project.PedestrianCounter.Benchmark import Benchmark
 import datetime
 import cv2
@@ -85,20 +86,16 @@ class MainProcess:
         self.tracker = self.tracker_dict[self.new_tracker_name][0]
 
     def change_source(self, name):
-        self.reset()
         self.stop()
+        self.counter.reset()
+        self.centroid_tracker.reset()
+        self.total_frames = 0
         self.sources[name][0].start_cap()
         self.source = self.sources[name][0]
         self.frame_time_start = time.perf_counter()
 
     def change_motion_vector(self, activate):
         self.motion_vector = activate
-
-    def reset(self):
-        if self.source is not None:
-            self.counter.reset()
-            self.centroid_tracker.reset()
-            self.total_frames = 0
 
     def stop(self):
         if self.source is not None:
@@ -214,7 +211,12 @@ class MainProcess:
         frame_height, frame_width = frame.shape[:2]
         boxes = []
 
-        if self.total_frames % self.frames_to_skip == 0:
+        if self.frames_to_skip == 0:
+            if self.change_detector:
+                self.activate_detector()
+
+            boxes = self.detector.process_frame(frame, frame_width, frame_height)
+        elif self.total_frames % self.frames_to_skip == 0:
             if self.change_detector:
                 self.activate_detector()
 
@@ -277,6 +279,8 @@ class MainProcessThread(QThread):
         self.main_process_paused = True
         self.main_process = MainProcess()
 
+        self.benchmark_manager = BenchmarkManager("benchmark.json")
+
     def change_source(self, cap_type):
         if not self.main_process_paused:
             self.stop_source()
@@ -304,6 +308,7 @@ class MainProcessThread(QThread):
                 self.main_process.benchmark.save_to_file(self.main_process.test_name)
                 self.stop_source()
                 self.changePixmap.emit(vars.EMPTY_IMAGE)
+                self.benchmark_manager.start_next(self)
                 continue
             rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             h, w, ch = rgb_image.shape

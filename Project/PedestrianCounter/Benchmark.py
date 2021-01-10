@@ -1,5 +1,5 @@
 import csv
-from operator import invert
+import json
 import numpy as np
 
 
@@ -11,6 +11,9 @@ class Benchmark:
         self.up = []
         self.down = []
 
+        self.scores_dict = {}
+        self.scores_dict["scores"] = []
+
     def add(self, fps, time, dis, up, down):
         self.fps.append(fps)
         self.frame_time.append(time)
@@ -19,7 +22,7 @@ class Benchmark:
         self.down.append(down)
 
     def save_to_file(self, name):
-        with open("Tests/CSV-{}.csv".format(name), "w+", newline="") as csv_file:
+        with open("Tests/CSV/CSV-{}.csv".format(name), "w+", newline="") as csv_file:
             writer = csv.writer(csv_file, delimiter=";")
             writer.writerow(["Frame", "FPS", "Frame Time", "Dis", "Up", "Down"])
             for i in range(0, len(self.fps)):
@@ -54,12 +57,25 @@ class Benchmark:
         self.frame_time.sort(reverse=True)
         mean_one_time = np.mean(np.array(self.frame_time[:one_len]).astype(np.float))
 
-        final_crossed = self.up[-1] - self.down[-1]
         final_disappeared = self.disappeared[-1]
-        with open("Tests/SCORE-{}.txt".format(name), "w+") as score_file:
-            score_file.write("Mean FPS: {}\n".format(mean_fps))
-            score_file.write("Mean 1% Low FPS: {}\n".format(mean_one_fps))
-            score_file.write("Mean Frame Time: {}\n".format(mean_time))
-            score_file.write("Mean 1% Low Frame Time: {}\n".format(mean_one_time))
-            score_file.write("Crossed: {}\n".format(final_crossed))
-            score_file.write("Disappeared: {}\n".format(final_disappeared))
+        final_up = self.up[-1]
+        final_down = self.down[-1]
+        final_crossed = final_up - final_down
+
+        scores = {
+            "test_name": name,
+            "mean_fps": mean_fps,
+            "mean_1low_fps": mean_one_fps,
+            "mean_frame_time": mean_time,
+            "mean_1low_frame_time": mean_one_time,
+            "up": final_up,
+            "down": final_down,
+            "crossed": final_crossed,
+            "disappeared": final_disappeared,
+        }
+
+        self.scores_dict["scores"].append(scores)
+
+    def save_scores(self):
+        with open("Tests/scores.json", "w+") as score_file:
+            json.dump(self.scores_dict, score_file)

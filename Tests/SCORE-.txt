@@ -1,6 +1,0 @@
-Mean FPS: 196.23788244341785
-Mean 1% Low FPS: 14.362534450838497
-Mean Frame Time: 0.012788005845674204
-Mean 1% Low Frame Time: 0.17282817692307686
-Crossed: -4
-Disappeared: 1
