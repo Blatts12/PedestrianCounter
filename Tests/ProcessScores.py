@@ -2,6 +2,9 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
+CorrectUp = 3
+CorrectDown = 7
+
 
 class Data:
     def __init__(self, scores):
@@ -15,13 +18,14 @@ class Data:
         self.down = []
         self.disappeared = []
         self.time = []
+        self.correct = []
         self.bar_width = 0.75
 
         for score in scores:
             if score["test_name"] == "":
                 continue
             self.r.append(int(score["test_name"]))
-            self.names.append(score["test_name"])
+            self.names.append(str(int(score["test_name"]) + 1))
             self.mean_fps_bar.append(score["mean_fps"] - score["mean_1low_fps"])
             self.mean_1low_fps_bar.append(score["mean_1low_fps"])
             self.mean_1low_frame_time.append(
@@ -32,6 +36,14 @@ class Data:
             self.down.append(score["down"])
             self.disappeared.append(score["disappeared"])
             self.time.append(score["time"])
+
+            if score["up"] == CorrectUp and score["down"] == CorrectDown:
+                if score["disappeared"] == 0:
+                    self.correct.append(2)
+                else:
+                    self.correct.append(1)
+            else:
+                self.correct.append(0)
 
 
 def draw_mean_fps_chart(data: Data):
@@ -125,7 +137,16 @@ def draw_crossed(data: Data):
     )
     plt.xlabel("Test ID")
     plt.ylabel("Number of pedestrians")
-    plt.xticks([r + bar_width for r in range(len(data.up))], data.r)
+
+    # for i, correct in enumerate(data.correct):
+    #     if correct == 2:
+    #         plt.text(r1[i], -1.175, "ok", color="green")
+    #     elif correct == 1:
+    #         plt.text(r1[i], -1.175, "ok", color="orange")
+    #     else:
+    #         plt.text(r1[i], -1.175, "ok", color="red")
+
+    plt.xticks([r + bar_width for r in range(len(data.up))], data.names)
 
     plt.legend()
     plt.savefig("Crossed.png")
