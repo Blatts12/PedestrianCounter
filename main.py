@@ -43,9 +43,6 @@ class MainWindow(QMainWindow):
         detector_section.changedSkipFrames.connect(
             self.main_process_thread.main_process.set_frames_to_skip
         )
-        detector_section.changedHorizontal.connect(
-            self.main_process_thread.main_process.set_horizontal
-        )
 
         ## Tracker Tab
         tracker_section = self.settings_layout.tracker_tab_layout.first_section
@@ -75,6 +72,9 @@ class MainWindow(QMainWindow):
         )
         counter_section.changedMotion.connect(
             self.main_process_thread.main_process.change_motion_vector
+        )
+        counter_section.changedHorizontal.connect(
+            self.main_process_thread.main_process.set_horizontal
         )
 
         # Display Layout

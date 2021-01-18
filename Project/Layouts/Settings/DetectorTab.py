@@ -15,7 +15,6 @@ class FirstSection(QFormLayout):
     changedDetectorIndex = pyqtSignal(int)
     changedDetectorName = pyqtSignal(str)
     changedSkipFrames = pyqtSignal(int)
-    changedHorizontal = pyqtSignal(bool)
 
     def __init__(self, detectors, *args, **kwargs):
         super(FirstSection, self).__init__(*args, **kwargs)
@@ -34,15 +33,8 @@ class FirstSection(QFormLayout):
         self.skip_frames_spinbox.setValue(6)
         self.skip_frames_spinbox.valueChanged.connect(self.changedSkipFrames.emit)
 
-        self.horizontal_checkbox = QCheckBox()
-        self.horizontal_checkbox.setText("Horizontal detection")
-        self.horizontal_checkbox.stateChanged.connect(
-            lambda s: self.changedHorizontal.emit(s == Qt.Checked)
-        )
-
         self.addRow("Detector:", self.detector_combo_box)
         self.addRow("Frames to skip:", self.skip_frames_spinbox)
-        self.addRow(self.horizontal_checkbox)
 
 
 class DetectorTabLayout(QGridLayout):
