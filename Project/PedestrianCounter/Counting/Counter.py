@@ -54,8 +54,8 @@ class Counter:
             if (
                 direction < 0
                 and mean_theta < 0
-                and centroid[1] < half_width
-                and centroid[1] > self.margin
+                and centroid[0] < half_width
+                and centroid[0] > self.margin
             ):
                 # print("[{}]LEFT-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.up += 1
@@ -64,8 +64,8 @@ class Counter:
             elif (
                 direction > 0
                 and mean_theta > 0
-                and centroid[1] > half_width
-                and centroid[1] < frame_width - self.margin
+                and centroid[0] > half_width
+                and centroid[0] < frame_width - self.margin
             ):
                 # print("[{}]RIGHT-MEAN_THETA: {}".format(person.id, mean_theta))
                 self.down += 1
